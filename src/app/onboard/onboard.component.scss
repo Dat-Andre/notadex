@@ -1,0 +1,100 @@
+/* .container-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: 100%;
+  margin-top: 10vh;
+} */
+
+.question {
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+.wallet-cards {
+  cursor: pointer;
+  margin: 1rem;
+  min-width: 15rem;
+  min-height: 12rem;
+}
+
+.wallet-cards.disabled {
+  cursor: not-allowed;
+}
+
+:host ::ng-deep {
+  .p-card .p-card-body {
+    min-width: 15rem;
+    min-height: 12rem;
+  }
+  .p-card .p-card-title {
+    text-align: center;
+  }
+  div.p-card-body {
+    /* -webkit-box-shadow: 0px 10px 15px 10px rgba(252,252,252,0.19);
+-moz-box-shadow: 0px 10px 15px 10px rgba(252,252,252,0.19); */
+    box-shadow: 0px 10px 15px 2px rgba(252, 252, 252, 0.19);
+  }
+  div.p-card-body:hover {
+    box-shadow: #76745e 0px 20px 30px -10px;
+  }
+  div.p-card-content {
+    font-style: oblique;
+    display: flex;
+    align-items: center;
+    padding: 0px;
+    flex-direction: column;
+    > i.in {
+      transform: rotate(90deg);
+    }
+    > i.out {
+      transform: rotate(270deg);
+    }
+    > i {
+      font-size: 4rem;
+      color: coral;
+    }
+    > p {
+      color: #d6d6d6;
+    }
+  }
+
+  p-card.disabled-card div.p-card-body {
+    box-shadow: none;
+  }
+  p-card.disabled-card div.p-card-title {
+    color: #414141;
+  }
+}
+
+.base-space {
+  margin: 3rem;
+}
+
+.base-space-overlay {
+  position: absolute;
+  width: 13%;
+  height: 24%;
+  background: rgba(255, 255, 255, 0.7);
+  margin-top: 16px;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow: auto;
+}
+
+.space-up-small {
+  margin-top: 2rem !important;
+}
+
+.disabled {
+  opacity: 0.5;
+  color: #414141;
+}

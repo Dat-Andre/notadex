@@ -1,0 +1,44 @@
+.wallet-cards{
+  cursor: pointer;
+  margin: 1rem;
+}
+
+img {
+  width: 100%;
+  width: 100px;
+  height: auto;
+}
+
+.p-dialog-header {
+  background: red !important;
+}
+
+:host ::ng-deep {
+
+  .p-dialog {
+    box-shadow: rgba(84, 84, 84, 0.25) 0px 54px 55px, rgba(255, 255, 255, 0.12) 0px -12px 30px, rgba(255, 255, 255, 0.12) 0px 4px 6px, rgba(255, 255, 255, 0.17) 0px 12px 13px, rgba(255, 255, 255, 0.09) 0px -3px 5px;
+    //background: #434343;
+    .p-dialog-content {
+      background: #434343;
+    }
+    .p-dialog-content{
+      padding: 18px;
+      >div {
+        justify-content: space-around;
+      }
+    }
+    .p-dialog-header{
+      background: #434343;
+    }
+  }
+
+  .p-card .p-card-title {
+    text-align: center;
+    color: coral;
+  }
+  div.p-card-body:hover {
+
+    box-shadow: #76745e 0px 20px 30px -10px;
+
+  }
+}

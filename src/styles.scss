@@ -1,1 +1,60 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+@import "assets/theme.css";
+@import "primeflex/primeflex.css";
+@font-face {
+  font-family: "Noto Sans";
+  src: url("/assets/fonts/NotoSans-Regular.ttf") format("truetype");
+}
+
+html,
+body {
+  height: 100vh;
+  margin: 0px;
+  overflow-y: scroll;
+  font-family: "Noto Sans";
+}
+
+.container-base {
+  /*  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: 100%;
+  margin-top: 10vh; */
+}
+
+.ellipsis-add {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:host ::ng-deep {
+  li :hover {
+    color: #3f3f3f !important;
+    background: #afa641 !important;
+    font-weight: 700 !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #aaaaaa;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

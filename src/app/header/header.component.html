@@ -1,0 +1,36 @@
+<div class="header-container">
+  <div>
+    <p-button icon="pi  pi-home" class="home" severity="primary"></p-button>
+    <p-button icon="pi  pi-sign-in" class="in" severity="success"></p-button>
+    <p-button icon="pi  pi-sign-out" class="out" severity="success"></p-button>
+  </div>
+  <div class="card flex" style="align-items: center; flex-wrap: wrap">
+    <!--     <div class="col-12 lg:col-7"> -->
+    <p class="m-0" *ngIf="walletService.wallet_primary && walletAddress !== ''">
+      <span
+        (click)="addToClipboard(walletAddress)"
+        class="connected-address"
+        style="color: #616161; padding-right: 1rem"
+        ><i>{{ formatedWalletAddress }}</i></span
+      >
+    </p>
+    <!--  </div> -->
+    <!-- <div class="col-12 lg:col-5"> -->
+    <p-button
+      label="Connect"
+      icon="pi"
+      severity="success"
+      *ngIf="!walletService.wallet_primary"
+      (onClick)="callWalletConnect()"
+    ></p-button>
+    <p-button
+      label="Disconect"
+      icon="pi"
+      (onClick)="walletService.disconnectWallet()"
+      *ngIf="walletService.wallet_primary"
+    ></p-button>
+    <!--  </div> -->
+  </div>
+</div>
+<p-toast></p-toast>
+<app-wallet-connect></app-wallet-connect>

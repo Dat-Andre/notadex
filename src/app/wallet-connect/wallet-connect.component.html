@@ -1,0 +1,17 @@
+<p-dialog [(visible)]="visible" [modal]="true" [showHeader]="false" [dismissableMask]="true" [draggable]="false" [resizable]="false" >
+  <div style="display: flex;">
+
+
+  <p-card header="Keplr" (click)="connectWallet('keplr')" class="wallet-cards">
+    <p class="m-0">
+      <img src="../assets/img/keplr.png"/>
+    </p>
+
+</p-card>
+<p-card header="Leap" (click)="connectWallet('leap')" class="wallet-cards">
+  <p class="m-0">
+  <img src="../assets/img/leap.jpg"/>
+</p>
+</p-card>
+</div>
+</p-dialog>

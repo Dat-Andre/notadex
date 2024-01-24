@@ -1,0 +1,560 @@
+<div class="grid">
+  <div class="col-12 title-text" *ngIf="!this.selectedOriginChain">
+    Choose the chain where your funds are located
+  </div>
+  <div
+    class="col-12 title-text"
+    *ngIf="
+      this.selectedOriginChain && !selectedExitDenom && !selectedSourceDenom
+    "
+  >
+    Select the token you want to use
+  </div>
+  <div
+    class="col-12 title-text"
+    *ngIf="
+      this.selectedOriginChain && selectedSourceDenom && !selectedExitDenom
+    "
+  >
+    Select the token you want to receive on Juno Network
+  </div>
+  <div class="col-12 lg:col-3 search-container">
+    <span
+      class="p-input-icon-left"
+      *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
+    >
+      <i class="pi pi-search"></i>
+      <input
+        autofocus
+        type="text"
+        pInputText
+        [(ngModel)]="searchText"
+        (ngModelChange)="searchTextApplyFilter()"
+        (keyup)="selectChainWithEnter($event)"
+      />
+    </span>
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        margin-top: 18px;
+        justify-content: center;
+      "
+      *ngIf="this.selectedOriginChain"
+    >
+      Get funds from: &nbsp;<span style="color: coral">{{
+        this.selectedOriginChain.chain_name | uppercase
+      }}</span>
+      <img
+        style="width: 25px; height: 25px; margin-left: 5px"
+        [src]="this.selectedOriginChain.logo_uri"
+      />&nbsp;&nbsp;
+      <a
+        role="button"
+        href="javascript:void(0);"
+        (click)="removeSelectedChain()"
+        >replace</a
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        margin-top: 18px;
+        justify-content: center;
+      "
+      *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+    >
+      Use token: &nbsp;
+      <img
+        style="width: 25px; height: 25px; margin-left: 5px"
+        [src]="this.selectedSourceDenom.logo_uri"
+      />
+      &nbsp;
+      <span style="color: coral">{{
+        this.selectedSourceDenom.recommended_symbol | uppercase
+      }}</span>
+      &nbsp;&nbsp;
+      <a
+        role="button"
+        href="javascript:void(0);"
+        (click)="removeSelectedSourceDenom()"
+        >replace</a
+      >
+    </div>
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        margin-top: 18px;
+        justify-content: center;
+      "
+      *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+    >
+      Get funds to: &nbsp;
+
+      <span style="color: coral">{{
+        this.selectedExitChain?.chain_name | uppercase
+      }}</span>
+      &nbsp;
+      <img
+        style="width: 25px; height: 25px; margin-left: 5px"
+        [src]="this.selectedExitChain?.logo_uri"
+      />
+
+      &nbsp;&nbsp;
+      <i class="pi pi-lock" style="font-size: 1.5rem"></i>
+    </div>
+    <div
+      style="
+        display: flex;
+        align-items: center;
+        margin-top: 18px;
+        justify-content: center;
+      "
+      *ngIf="
+        this.selectedOriginChain &&
+        this.selectedSourceDenom &&
+        this.selectedExitDenom
+      "
+    >
+      Receive token: &nbsp;
+      <img
+        style="width: 25px; height: 25px; margin-left: 5px"
+        [src]="this.selectedExitDenom.logo_uri"
+      />
+      &nbsp;
+      <span style="color: coral">{{
+        this.selectedExitDenom.recommended_symbol | uppercase
+      }}</span>
+      &nbsp;&nbsp;
+      <a
+        role="button"
+        href="javascript:void(0);"
+        (click)="removeSelectedExitDenom()"
+        >replace</a
+      >
+    </div>
+  </div>
+  <div class="col-12 lg:col-9 chains-container" *ngIf="!selectedOriginChain">
+    <div
+      class="chain"
+      (click)="selectSourceChain(chain)"
+      *ngFor="let chain of filteredChains"
+    >
+      <div class="items">
+        <span>{{ chain.chain_name | uppercase }}</span>
+        <img
+          style="width: 25px; height: 25px; margin-left: 5px"
+          [src]="
+            chain.chain_id === OSMOSIS_CHAIN_ID ? OSMOSIS_LOGO : chain.logo_uri
+          "
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-12 lg:col-9 chains-container"
+    *ngIf="selectedOriginChain && !selectedSourceDenom && !selectedExitDenom"
+  >
+    <div
+      class="denom"
+      (click)="selectSourceDenom(denom)"
+      *ngFor="let denom of filteredDenoms"
+    >
+      <div class="items items-denom">
+        <img
+          style="width: 25px; height: 25px; margin-left: 5px"
+          [src]="denom?.logo_uri"
+        />
+        <span class="ellipsis-add"
+          >${{ denom.recommended_symbol | uppercase }}</span
+        >
+      </div>
+      <div class="origin">
+        Balance:
+        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+      </div>
+      <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
+    </div>
+  </div>
+  <div
+    class="col-12 lg:col-9 chains-container"
+    *ngIf="selectedOriginChain && selectedSourceDenom && !selectedExitDenom"
+  >
+    <div
+      class="denom"
+      (click)="selectExitDenom(denom)"
+      *ngFor="let denom of filteredDenoms"
+    >
+      <div class="items items-denom">
+        <img
+          style="width: 25px; height: 25px; margin-left: 5px"
+          [src]="denom?.logo_uri"
+        />
+        ${{ denom.recommended_symbol | uppercase }}
+      </div>
+      <div class="origin">
+        Balance:
+        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+      </div>
+      <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
+    </div>
+  </div>
+  <div
+    class="col-12 lg:col-4 chains-container transfer"
+    *ngIf="selectedOriginChain && selectedSourceDenom && selectedExitDenom"
+  >
+    <div class="space-up">
+      <p-inputNumber
+        id="amout-out"
+        [(ngModel)]="sourceAmount"
+        inputId="locale-us"
+        mode="decimal"
+        locale="en-US"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="10"
+      >
+      </p-inputNumber>
+    </div>
+    <div class="balance-swap-out space-up">
+      Available:&nbsp;<i
+        class="pi pi-spin pi-spinner"
+        *ngIf="
+          !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+        "
+      ></i>
+      {{ this.selectedSourceDenom.balance | number : "1.2-20" }}
+      &nbsp;
+      <img
+        style="width: 25px; height: 25px; margin-left: 5px"
+        [src]="this.selectedSourceDenom.logo_uri"
+      />
+      &nbsp;
+      <span style="color: coral">{{
+        this.selectedSourceDenom.recommended_symbol | uppercase
+      }}</span>
+      &nbsp;&nbsp;
+      <div>
+        <p-button
+          class="amount-percentages"
+          label="25%"
+          [rounded]="true"
+          severity="warning"
+          [disabled]="
+            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+          "
+          (click)="sourceAmount = this.selectedSourceDenom.balance * 0.25"
+        ></p-button>
+        <p-button
+          label="50%"
+          class="amount-percentages"
+          [rounded]="true"
+          severity="warning"
+          [disabled]="
+            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+          "
+          (click)="sourceAmount = this.selectedSourceDenom.balance * 0.5"
+        ></p-button>
+        <p-button
+          class="amount-percentages"
+          label="75%"
+          [rounded]="true"
+          severity="warning"
+          [disabled]="
+            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+          "
+          (click)="sourceAmount = this.selectedSourceDenom.balance * 0.75"
+        ></p-button>
+        <p-button
+          class="amount-percentages"
+          label="Max"
+          [rounded]="true"
+          severity="warning"
+          [disabled]="
+            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+          "
+          (click)="sourceAmount = this.selectedSourceDenom.balance"
+        ></p-button>
+      </div>
+    </div>
+    <div class="space-up">
+      <p class="m-0" *ngIf="!editSlippage">
+        Slippage tolerance:&nbsp;
+        <span style="color: coral">{{ slippage }}%</span>
+        &nbsp;<a
+          role="button"
+          href="javascript:void(0);"
+          (click)="editSlippage = !editSlippage"
+          >edit</a
+        >
+      </p>
+      <div style="text-align: center" *ngIf="editSlippage">
+        <input
+          id="slippage"
+          type="number"
+          pInputText
+          [min]="0"
+          [max]="100"
+          [step]="0.1"
+          [(ngModel)]="slippage"
+          class="w-full"
+        />
+        <p-slider [(ngModel)]="slippage" [step]="0.1" class="w-full"></p-slider>
+        <div class="space-up-small">
+          <p-button
+            id="done-slippage"
+            label="Done"
+            (click)="editSlippage = !editSlippage"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="space-up"
+      style="display: flex; flex-direction: column; align-items: center"
+    >
+      <p class="m-0" *ngIf="!addDestinyWallet">
+        <span style="color: #616161" *ngIf="destinyWalletAddress !== ''"
+          >Destiny wallet:&nbsp;<i>{{ destinyWalletAddress }}</i></span
+        >
+      </p>
+      <p class="m-0" *ngIf="!addDestinyWallet">
+        <a
+          role="button"
+          href="javascript:void(0);"
+          (click)="addDestinyWallet = !addDestinyWallet"
+          >Change destiny wallet</a
+        >
+      </p>
+      <div
+        style="text-align: center; display: flex; flex-direction: column"
+        *ngIf="addDestinyWallet"
+      >
+        <!-- <span class="p-input-icon-right"> -->
+        <!-- <i
+            class="pi pi-copy"
+            style="cursor: pointer"
+            (click)="addToClipboard(destinyWalletAddress)"
+          ></i> -->
+        <input
+          id="destinyWalletAddress"
+          type="text"
+          pInputText
+          [(ngModel)]="destinyWalletAddress"
+        />
+        <small *ngIf="destinyWalletAddressCheck" id="username-help"
+          >Not a valid address...</small
+        >
+        <!-- </span> -->
+        <div class="space-up-small">
+          <p-button
+            id="done-slippage"
+            label="Done"
+            [disabled]="destinyWalletAddressCheck"
+            (click)="addDestinyWallet = !addDestinyWallet"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+    <div class="space-up" *ngIf="routesChecked">No routes available...</div>
+    <div class="space-up">
+      <!-- <p-button
+        label="Preview"
+        *ngIf="!previewInformation"
+        [disabled]="!(sourceAmount > 0)"
+        [loading]="loading"
+        (onClick)="getRouteAndExitAmount()"
+      ></p-button> -->
+      <p-button
+        [label]="
+          this.wallet_service.wallet_primary_connected
+            ? 'Execute'
+            : 'Connect Wallet'
+        "
+        [loading]="loading"
+        [disabled]="
+          (this.wallet_service.wallet_primary_connected &&
+            !(sourceAmount > 0)) ||
+          (this.wallet_service.wallet_primary_connected &&
+            !previewInformation) ||
+          editSlippage ||
+          (this.wallet_service.wallet_primary_connected &&
+            selectedSourceDenom.balance) === 0 ||
+          (this.wallet_service.wallet_primary_connected &&
+            selectedSourceDenom.balance < sourceAmount) ||
+          (selectedExitDenom.chain_id === selectedSourceDenom.chain_id &&
+            selectedExitDenom.denom === selectedSourceDenom.denom &&
+            destinyWalletAddress === '' &&
+            this.wallet_service.wallet_primary_connected) ||
+          addDestinyWallet
+        "
+        [loading]="loading"
+        (onClick)="executePreview()"
+      ></p-button>
+    </div>
+  </div>
+  <div
+    class="col-12 lg:col-5 search-container"
+    style="padding: 3rem"
+    *ngIf="selectedOriginChain && selectedSourceDenom && selectedExitDenom"
+  >
+    <div class="card">
+      <p-accordion
+        (activeIndexChange)="activeIndexChange($event)"
+        [activeIndex]="activeIndex"
+      >
+        <p-accordionTab header="Preview" *ngIf="previewInformation">
+          <div class="grid">
+            <div class="col-12 lg:col-5">
+              <img
+                style="width: 25px; height: 25px; margin-left: 5px"
+                [src]="this.selectedSourceDenom.logo_uri"
+              />
+              <p class="m-0">
+                Amount In
+                <b style="color: coral">{{
+                  getNumberFromString(
+                    previewInformation.amount_in,
+                    selectedSourceDenom.decimals
+                  ) | number : "1.2-20"
+                }}</b
+                >&nbsp;<i>(${{ previewInformation.usd_amount_in }})</i>
+              </p>
+            </div>
+            <div
+              class="col-12 lg:col-2"
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <i class="pi pi-sync" style="font-size: 1.3rem"></i>
+            </div>
+            <div class="col-12 lg:col-5">
+              <img
+                style="width: 25px; height: 25px; margin-left: 5px"
+                [src]="this.selectedExitDenom.logo_uri"
+              />
+              <p class="m-0">
+                Amount Out
+                <b style="color: coral">{{
+                  getNumberFromString(
+                    previewInformation.estimated_amount_out,
+                    selectedExitDenom.decimals
+                  ) | number : "1.2-20"
+                }}</b
+                >&nbsp;<i>(${{ previewInformation.usd_amount_out }})</i>
+              </p>
+            </div>
+            <div class="col-12">
+              <p class="m-0">
+                Estimated price impact
+                <b style="color: coral"
+                  >{{
+                    (previewInformation.swap_price_impact_percent
+                      ? previewInformation.swap_price_impact_percent
+                      : 0
+                    ) | number : "1.2-4"
+                  }}%</b
+                >&nbsp;
+              </p>
+            </div>
+            <div class="col-12 space-up" *ngIf="eventsFromEstimate">
+              <p-timeline [value]="events">
+                <ng-template pTemplate="content" let-event>
+                  <p
+                    class="m-0"
+                    style="display: flex; flex-wrap: wrap"
+                    *ngIf="event.operationType === 'Transfer'"
+                  >
+                    {{ event.chainSource | uppercase
+                    }}<img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.chainSourceIcon"
+                    />
+                    &nbsp; to &nbsp;{{ event.chainExit | uppercase
+                    }}<img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.chainExitIcon"
+                    />
+                  </p>
+                  <p
+                    class="m-0"
+                    style="display: flex; flex-wrap: wrap"
+                    *ngIf="event.operationType === 'Swap'"
+                  >
+                    <img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.swapDenomInIcon"
+                    />
+                    {{ event.swapDenomInName | uppercase }} &nbsp; to &nbsp;<img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.swapDenomOutIcon"
+                    />
+                    {{ event.swapDenomOutName | uppercase }}
+                  </p>
+                </ng-template>
+                <ng-template pTemplate="opposite" let-event>
+                  <p
+                    class="m-0 operation-type"
+                    style="display: flex; flex-wrap: wrap"
+                    *ngIf="event.operationType === 'Transfer'"
+                  >
+                    <b style="color: coral">{{ event.operationType }}</b
+                    >&nbsp;
+                    <img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.denomIcon"
+                    />
+                    {{ event.denomName }}
+                  </p>
+                  <p
+                    class="m-0 operation-type"
+                    style="display: flex; flex-wrap: wrap"
+                    *ngIf="event.operationType === 'Swap'"
+                  >
+                    <b style="color: coral">{{ event.operationType }}</b
+                    >&nbsp;
+                    <img
+                      style="width: 25px; height: 25px; margin-left: 5px"
+                      [src]="event.chainSourceIcon"
+                    />
+                    {{ event.chainSource | uppercase }}
+                  </p>
+                </ng-template>
+              </p-timeline>
+            </div>
+          </div>
+        </p-accordionTab>
+      </p-accordion>
+    </div>
+  </div>
+</div>
+<p-toast position="top-right" key="balances" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column align-items-start" style="flex: 1">
+      <div class="flex align-items-center gap-2">
+        <span class="font-bold text-900"
+          >Getting Data <i class="pi pi-spin pi-cog"></i
+        ></span>
+      </div>
+      <div class="font-medium text-lg my-3 text-900">{{ message.summary }}</div>
+    </div>
+  </ng-template>
+</p-toast>
+<p-toast position="top-right" key="broadcast" [baseZIndex]="5000">
+  <ng-template let-message pTemplate="message">
+    <div class="flex flex-column align-items-start" style="flex: 1">
+      <div class="flex align-items-center gap-2">
+        <span class="font-bold text-900"
+          >Sending Transaction... <i class="pi pi-spin pi-cog"></i
+        ></span>
+      </div>
+      <div class="font-medium text-lg my-3 text-900">{{ message.summary }}</div>
+    </div>
+  </ng-template>
+</p-toast>
+<app-wallet-connect #walletConnect></app-wallet-connect>
+<p-toast></p-toast>
