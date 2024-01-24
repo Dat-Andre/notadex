@@ -15,13 +15,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "baseHref": "/notadex/",
             "outputPath": "dist/notadex",
             "index": "src/index.html",
-            "browser": "src/main.ts",
             "polyfills": ["zone.js"],
+            "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
@@ -40,7 +40,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "500kb",
-                  "maximumError": "10mb"
+                  "maximumError": "15mb"
                 },
                 {
                   "type": "anyComponentStyle",
