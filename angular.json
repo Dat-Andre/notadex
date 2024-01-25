@@ -21,7 +21,7 @@
             "outputPath": "dist/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
-            "browser": "src/main.ts",
+            "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
