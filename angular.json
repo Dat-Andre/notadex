@@ -21,13 +21,10 @@
             "outputPath": "dist/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
-            "stylePreprocessorOptions": {
-              "includePaths": ["src/styles", "node_modules"]
-            },
             "styles": [
               "src/styles.scss",
               "./node_modules/primeflex/primeflex.css"
@@ -37,7 +34,7 @@
           },
           "configurations": {
             "production": {
-              "optimization": true,
+              "optimization": false,
               "sourceMap": false,
               "budgets": [
                 {
@@ -68,7 +65,7 @@
               "buildTarget": "my_dex:build:production"
             },
             "development": {
-              "buildTarget": "my_dex:build:development"
+              "buildTarget": "my_dex:build:production"
             }
           },
           "defaultConfiguration": "development"

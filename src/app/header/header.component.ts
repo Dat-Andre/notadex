@@ -5,6 +5,7 @@ import { WalletService } from '../wallet.service';
 import { WalletConnectComponent } from '../wallet-connect/wallet-connect.component';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -21,9 +22,11 @@ export class HeaderComponent implements OnInit {
   @ViewChild(WalletConnectComponent) walletConnect!: WalletConnectComponent;
   constructor(
     public walletService: WalletService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private route: ActivatedRoute
   ) {}
   ngOnInit(): void {
+    this.route.url.subscribe(console.log);
     this.walletService.walletConnected.subscribe(async (val) => {
       if (val) {
         const address = await this.walletService.getAddressForChain(

@@ -4,8 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "build-prod": "ng build --configuration 'production'",
+    "build": "ng build --configuration 'production' --baseHref='https://dolphin-app-waqb6.ondigitalocean.app/'",
+    "build-prod": "ng build --configuration 'production' --baseHref='https://dolphin-app-waqb6.ondigitalocean.app/'",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },

@@ -12,13 +12,16 @@ export const routes: Routes = [
   {
     path: 'intents',
     component: OnboardComponent,
+    pathMatch: 'full',
   },
   {
     path: 'in',
     component: SwapInComponent,
+    pathMatch: 'full',
   },
   {
     path: 'out',
     component: SwapOutComponent,
+    pathMatch: 'full',
   },
 ];
