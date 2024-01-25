@@ -18,13 +18,16 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "baseHref": "/notadex/",
-            "outputPath": "dist/notadex",
+            "outputPath": "dist/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
             "main": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["src/favicon.ico", "src/assets"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles", "node_modules"]
+            },
             "styles": [
               "src/styles.scss",
               "./node_modules/primeflex/primeflex.css"
@@ -34,7 +37,7 @@
           },
           "configurations": {
             "production": {
-              "optimization": false,
+              "optimization": true,
               "sourceMap": false,
               "budgets": [
                 {
