@@ -1,23 +1,96 @@
-<div class="container-base">
-  <div class="question">Whatcha wanna do?</div>
-  <div class="options-container">
-    <div class="base-space" (click)="routeToSwapIn()">
-      <p-card header="get IN" class="wallet-cards">
-        <i class="pi pi-sign-in in"></i>
-        <p class="m-0 space-up-small">Deposit assets on Juno</p>
-      </p-card>
+<div class="container-base grid">
+  <!-- <div class="col-1"></div> -->
+  <div class="col-12">
+    <div class="question">Whatcha wanna do?</div>
+    <div class="options-container">
+      <div class="base-space" (click)="routeToSwapIn()">
+        <p-card header="get IN" class="wallet-cards">
+          <i class="pi pi-sign-in in"></i>
+          <p class="m-0 space-up-small">Deposit assets on Juno</p>
+        </p-card>
+      </div>
+      <div class="base-space" (click)="routeToSwapOut()">
+        <p-card header="get OUT" class="wallet-cards">
+          <i class="pi pi-sign-out out"></i>
+          <p class="m-0 space-up-small">Withdraw assets from Juno</p>
+        </p-card>
+      </div>
     </div>
-    <div class="base-space">
-      <p-card header="get OUT" class="wallet-cards">
-        <i class="pi pi-sign-out out"></i>
-        <p class="m-0 space-up-small">Withdraw assets from Juno</p>
-      </p-card>
-    </div>
-    <!-- <div class="base-space">
-      <p-card header="Pro" class="wallet-cards disabled-card">
-        <i class="pi pi-chart-bar" style="color: #492d23"></i>
-        <p class="m-0 space-up-small disabled">Do it like a pro</p>
-      </p-card>
-    </div> -->
   </div>
+  <div class="col-12" style="text-align: center; margin-top: 5rem">
+    <i class="pi pi-gift" (click)="friends = !friends"></i>
+  </div>
+  <div class="friends" *ngIf="friends">
+    <img
+      style="width: 75px; height: 75px"
+      alt="friends"
+      src="../assets/img/mstile-150x150.png"
+    />
+    <br />
+    <div class="friends-text">
+      <p>Friends of notAdex</p>
+      <p>notAdex is a community project</p>
+      <p>built by the community for the community</p>
+      <p></p>
+      <p>And... while I'm writing this text, this is what comes to my mind</p>
+      <p>
+        <a
+          role="button"
+          href="https://www.youtube.com/watch?v=QFgcqB8-AxE"
+          target="_blank"
+          >regarding democracy...
+        </a>
+      </p>
+      <br />
+      <br />
+      <br />
+      <br />
+      <br />
+      <div
+        style="min-width: 20px; min-height: 20px"
+        (mouseover)="showeternalFightbtn = true"
+        (mouseout)="showeternalFightbtn = false"
+      >
+        <img
+          style="width: 75px; height: 75px; display: none"
+          alt="friends"
+          [ngStyle]="{ display: showeternalFightbtn ? 'block' : 'none' }"
+          src="../assets/img/mstile-150x150.png"
+          (click)="eternalFight = !eternalFight"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- <p-sidebar [(visible)]="eternalFight" position="bottom">
+  <h3>Bottom Sidebar</h3>
+</p-sidebar> -->
+  <p-sidebar #sidebarRef [(visible)]="eternalFight">
+    <ng-template pTemplate="headless">
+      <div>
+        <i
+          >"... <br />As I got older, <br />
+          I realised that there were no real winners <br /><br />
+          And there were no real losers in physiological warfare<br /><br />
+          But there were victims and there were students <br /><br />
+          It wasn't David versus Goliath, it was a pendulum Eternally swayin'
+          from the dark to the light <br /><br />
+          And the more intensely that the light shone, the darker the shadow it
+          cast<br /><br />
+          It was never really a battle for me to win, it was an eternal dance<br /><br />
+          And like a dance, the more rigid I became, the harder it got
+          <br /><br />
+          The more I cursed my clumsy footsteps, the more I struggled<br /><br />
+          So I got older and I learned to relax<br /><br />
+          And I learned to soften and that dance got easier <br /><br />
+          It is this eternal dance that separates human beings<br /><br />
+          From angels, from demons, from gods <br /><br />
+          And I must not forget, we must not forget<br />
+          <br />
+          That we are human beings"</i
+        >
+        <br />
+      </div>
+    </ng-template>
+  </p-sidebar>
 </div>

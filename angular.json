@@ -15,27 +15,31 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "baseHref": "https://dolphin-app-waqb6.ondigitalocean.app/",
+            "baseHref": "/notadex/",
             "outputPath": "dist/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/favicon.ico", "src/assets"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              "src/assets/favicon-32x32.png"
+            ],
             "styles": [
               "src/styles.scss",
               "./node_modules/primeflex/primeflex.css"
             ],
             "scripts": [],
-            "sourceMap": false
+            "sourceMap": true
           },
           "configurations": {
             "production": {
               "optimization": false,
-              "sourceMap": false,
+              "sourceMap": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -65,7 +69,7 @@
               "buildTarget": "my_dex:build:production"
             },
             "development": {
-              "buildTarget": "my_dex:build:production"
+              "buildTarget": "my_dex:build:development"
             }
           },
           "defaultConfiguration": "development"

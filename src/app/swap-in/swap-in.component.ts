@@ -42,6 +42,8 @@ import { MessageService } from 'primeng/api';
 import { WalletConnectComponent } from '../wallet-connect/wallet-connect.component';
 import { Observable, first, interval, switchMap, take, tap } from 'rxjs';
 import { fromBech32 } from '@cosmjs/encoding';
+import { TransactionInfoComponent } from '../transaction-info/transaction-info.component';
+import { TradeParametersSelectionComponent } from '../trade-parameters-selection/trade-parameters-selection.component';
 
 @Component({
   selector: 'app-swap-in',
@@ -61,10 +63,12 @@ import { fromBech32 } from '@cosmjs/encoding';
     SliderModule,
     WalletConnectComponent,
     TimelineModule,
+    TransactionInfoComponent,
+    TradeParametersSelectionComponent,
   ],
   providers: [
-    ChainsFilterPipe,
     DenomsFilterPipe,
+    ChainsFilterPipe,
     AutoFocusDirective,
     MessageService,
   ],
@@ -286,9 +290,9 @@ export class SwapInComponent implements OnInit {
     }
   }
 
-  searchTextApplyFilter() {
+  /* searchTextApplyFilter() {
     console.log(this.searchText);
-  }
+  } */
 
   getChainPrefixFromRegistry(chainId: string | undefined) {
     if (!chainId) {
@@ -644,7 +648,7 @@ export class SwapInComponent implements OnInit {
         });
         for (const rpc of rpc_list) {
           console.log('rpc url', rpc);
-          const registry = new Registry([...defaultRegistryTypes]);
+          //const registry = new Registry([...defaultRegistryTypes]);
           try {
             signingStargateClient =
               await SigningCosmWasmClient.connectWithSigner(
@@ -653,8 +657,8 @@ export class SwapInComponent implements OnInit {
                 {
                   gasPrice: GasPrice.fromString(
                     `${feeInfo?.average_gas_price ?? 0}${feeInfo?.denom}`
-                  ),
-                  registry: registry as any,
+                  ) /* ,
+                  registry: registry as any, */,
                 }
               );
           } catch (err) {
@@ -699,8 +703,23 @@ export class SwapInComponent implements OnInit {
               amount: msgJSON.amount,
             },
           };
+        } else if (
+          multihopMsg.msg_type_url === '/cosmwasm.wasm.v1.MsgExecuteContract'
+        ) {
+          console.log(multihopMsg.msg_type_url);
+          console.log('multihopMsg: ', multihopMsg);
+          msg = {
+            typeUrl: multihopMsg.msg_type_url,
+            value: {
+              sender: msgJSON.sender,
+              contract: msgJSON.contract,
+              msg: Uint8Array.from(Buffer.from(JSON.stringify(msgJSON.msg))),
+              funds: msgJSON.funds,
+            },
+          };
         } else {
           console.log(multihopMsg.msg_type_url);
+
           msg = {
             typeUrl: multihopMsg.msg_type_url,
             value: {

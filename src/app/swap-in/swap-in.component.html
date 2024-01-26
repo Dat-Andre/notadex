@@ -1,4 +1,4 @@
-<div class="grid">
+<div class="grid upaupa">
   <div class="col-12 title-text" *ngIf="!this.selectedOriginChain">
     Choose the chain where your funds are located
   </div>
@@ -16,10 +16,21 @@
       this.selectedOriginChain && selectedSourceDenom && !selectedExitDenom
     "
   >
-    Select the token you want to receive on Juno Network
+    Select the token you want to receive on JUNO NETWORK
   </div>
   <div class="col-12 lg:col-3 search-container">
-    <span
+    <app-trade-parameters-selection
+      [selectedOriginChain]="selectedOriginChain"
+      [selectedExitChain]="selectedExitChain"
+      [selectedSourceDenom]="selectedSourceDenom"
+      [selectedExitDenom]="selectedExitDenom"
+      [in]="true"
+      (removeSelectedChainEvent)="removeSelectedChain()"
+      (removeSelectedSourceDenomEvent)="removeSelectedSourceDenom()"
+      (removeSelectedExitDenomEvent)="removeSelectedExitDenom()"
+      (searchTextEvent)="searchText = $event"
+    ></app-trade-parameters-selection>
+    <!-- <span
       class="p-input-icon-left"
       *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
     >
@@ -29,7 +40,6 @@
         type="text"
         pInputText
         [(ngModel)]="searchText"
-        (ngModelChange)="searchTextApplyFilter()"
         (keyup)="selectChainWithEnter($event)"
       />
     </span>
@@ -134,7 +144,7 @@
         (click)="removeSelectedExitDenom()"
         >replace</a
       >
-    </div>
+    </div> -->
   </div>
   <div class="col-12 lg:col-9 chains-container" *ngIf="!selectedOriginChain">
     <div
@@ -331,12 +341,6 @@
         style="text-align: center; display: flex; flex-direction: column"
         *ngIf="addDestinyWallet"
       >
-        <!-- <span class="p-input-icon-right"> -->
-        <!-- <i
-            class="pi pi-copy"
-            style="cursor: pointer"
-            (click)="addToClipboard(destinyWalletAddress)"
-          ></i> -->
         <input
           id="destinyWalletAddress"
           type="text"
@@ -346,7 +350,6 @@
         <small *ngIf="destinyWalletAddressCheck" id="username-help"
           >Not a valid address...</small
         >
-        <!-- </span> -->
         <div class="space-up-small">
           <p-button
             id="done-slippage"
@@ -359,13 +362,6 @@
     </div>
     <div class="space-up" *ngIf="routesChecked">No routes available...</div>
     <div class="space-up">
-      <!-- <p-button
-        label="Preview"
-        *ngIf="!previewInformation"
-        [disabled]="!(sourceAmount > 0)"
-        [loading]="loading"
-        (onClick)="getRouteAndExitAmount()"
-      ></p-button> -->
       <p-button
         [label]="
           this.wallet_service.wallet_primary_connected
@@ -399,7 +395,14 @@
     style="padding: 3rem"
     *ngIf="selectedOriginChain && selectedSourceDenom && selectedExitDenom"
   >
-    <div class="card">
+    <app-transaction-info
+      [previewInformation]="previewInformation"
+      [assets]="assets"
+      [chains]="chains"
+      [selectedSourceDenom]="selectedSourceDenom"
+      [selectedExitDenom]="selectedExitDenom"
+    ></app-transaction-info>
+    <!-- <div class="card">
       <p-accordion
         (activeIndexChange)="activeIndexChange($event)"
         [activeIndex]="activeIndex"
@@ -529,7 +532,7 @@
           </div>
         </p-accordionTab>
       </p-accordion>
-    </div>
+    </div> -->
   </div>
 </div>
 <p-toast position="top-right" key="balances" [baseZIndex]="5000">

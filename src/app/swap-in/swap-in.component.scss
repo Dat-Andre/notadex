@@ -123,3 +123,13 @@
     min-width: 350px;
   }
 }
+
+@media (max-width: 500px) {
+  .upaupa {
+    margin-top: 29px;
+  }
+
+  .chains-container {
+    justify-content: center;
+  }
+}

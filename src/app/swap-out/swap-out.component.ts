@@ -42,6 +42,9 @@ import { WalletService } from '../wallet.service';
 import * as ChainRegistry from 'chain-registry';
 import { Registry } from '@cosmjs/proto-signing';
 import { Buffer } from 'buffer';
+import { TransactionInfoComponent } from '../transaction-info/transaction-info.component';
+import { TradeParametersSelectionComponent } from '../trade-parameters-selection/trade-parameters-selection.component';
+import { LogsService } from '../logs.service';
 
 @Component({
   selector: 'app-swap-out',
@@ -55,12 +58,12 @@ import { Buffer } from 'buffer';
     InputNumberModule,
     ButtonModule,
     CardModule,
-    AccordionModule,
     ToastModule,
     ProgressSpinnerModule,
     SliderModule,
     WalletConnectComponent,
-    TimelineModule,
+    TransactionInfoComponent,
+    TradeParametersSelectionComponent,
   ],
   providers: [
     ChainsFilterPipe,
@@ -199,7 +202,8 @@ export class SwapOutComponent implements OnInit {
     public wallet_service: WalletService,
     private filter: ChainsFilterPipe,
     private filterDenoms: DenomsFilterPipe,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private logsService: LogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -389,7 +393,7 @@ export class SwapOutComponent implements OnInit {
         key: 'balances',
         sticky: true,
         severity: 'info',
-        summary: 'Trying to find a RPC provider that works...',
+        summary: 'Trying to find a free of charge RPC provider that works...',
       });
 
       console.log(rpcList);
@@ -453,7 +457,7 @@ export class SwapOutComponent implements OnInit {
       key: 'balances',
       sticky: true,
       severity: 'info',
-      summary: 'Trying to find a RPC provider that works...',
+      summary: 'Trying to find a free of charge RPC provider that works...',
     });
     if (rpcList) {
       //console.log(rpcList);
@@ -618,8 +622,6 @@ export class SwapOutComponent implements OnInit {
         let rpc_list = ChainRegistry.chains.find(
           (chain) => chain.chain_id === multihopMsg.chain_id
         )?.apis?.rpc;
-        /* 'https://rpc.cosmos.directory/' +
-        multihopMsg.chain_id.split('-')[0]; */
         if (rpc_list === undefined || rpc_list.length === 0) {
           return;
         }
@@ -648,12 +650,11 @@ export class SwapOutComponent implements OnInit {
           key: 'balances',
           sticky: true,
           severity: 'info',
-          summary:
-            'Trying to find a free RPC provider that works to send the transaction...',
+          summary: 'Trying to find a free of charge RPC provider that works...',
         });
         for (const rpc of rpc_list) {
           console.log('rpc url', rpc);
-          const registry = new Registry([...defaultRegistryTypes]);
+          //const registry = new Registry([...defaultRegistryTypes]);
           try {
             signingStargateClient =
               await SigningCosmWasmClient.connectWithSigner(
@@ -662,8 +663,8 @@ export class SwapOutComponent implements OnInit {
                 {
                   gasPrice: GasPrice.fromString(
                     `${feeInfo?.average_gas_price ?? 0}${feeInfo?.denom}`
-                  ),
-                  registry: registry as any,
+                  ) /* ,
+                  registry: registry as any, */,
                 }
               );
           } catch (err) {
@@ -803,13 +804,32 @@ export class SwapOutComponent implements OnInit {
           deliverTxResponse.transactionHash,
           this.selectedOriginChain.chain_id
         )
-        .subscribe((res) => {
-          if (!this.selectedOriginChain) return;
-          this.executeCheckStatusLoop(
-            res.tx_hash,
-            this.selectedOriginChain?.chain_id
-          );
-        });
+        .subscribe(
+          (res) => {
+            if (!this.selectedOriginChain) return;
+            this.executeCheckStatusLoop(
+              res.tx_hash,
+              this.selectedOriginChain?.chain_id
+            );
+          },
+          async (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Result',
+              detail: 'Something went wrong setting up the Tx tracking... ',
+              life: 5000,
+            });
+            let address;
+            if (this.selectedOriginChain) {
+              address = await this.wallet_service.getAddressForChain(
+                this.selectedOriginChain?.chain_id
+              );
+            }
+            this.logsService
+              .postLog('Inititate Tracking', address, err)
+              .subscribe((res) => console.log(res));
+          }
+        );
     }, 5000);
   }
 
@@ -876,6 +896,15 @@ export class SwapOutComponent implements OnInit {
                 'The initial transaction or a subsequent transfer failed and lifecycle tracking has concluded.',
               life: 5000,
             });
+            let address;
+            if (this.selectedOriginChain) {
+              address = await this.wallet_service.getAddressForChain(
+                this.selectedOriginChain?.chain_id
+              );
+            }
+            this.logsService
+              .postLog('Tracking Process', address, res)
+              .subscribe((res) => console.log(res));
           }
 
           if (
@@ -893,7 +922,7 @@ export class SwapOutComponent implements OnInit {
             );
           }
         },
-        (err) => {
+        async (err) => {
           this.messageService.clear('broadcast');
           this.messageService.add({
             severity: 'error',
@@ -901,6 +930,15 @@ export class SwapOutComponent implements OnInit {
             detail: 'Something went wrong while tracking the transation...',
             life: 5000,
           });
+          let address;
+          if (this.selectedOriginChain) {
+            address = await this.wallet_service.getAddressForChain(
+              this.selectedOriginChain?.chain_id
+            );
+          }
+          this.logsService
+            .postLog('Tracking Process', address, err)
+            .subscribe((res) => console.log(res));
           console.log(err);
         }
       );

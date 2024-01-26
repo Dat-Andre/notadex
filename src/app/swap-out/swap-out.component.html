@@ -1,11 +1,19 @@
-<div class="grid">
-  <div class="col-12 title-text" *ngIf="!this.selectedOriginChain">
-    Choose the chain where your funds are located
+<div class="grid upaupa">
+  <div
+    class="col-12 title-text"
+    *ngIf="
+      this.selectedOriginChain && selectedSourceDenom && !selectedExitChain
+    "
+  >
+    Choose the chain where you want to receive your funds
   </div>
   <div
     class="col-12 title-text"
     *ngIf="
-      this.selectedOriginChain && !selectedExitDenom && !selectedSourceDenom
+      this.selectedOriginChain &&
+      !selectedExitChain &&
+      !selectedExitDenom &&
+      !selectedSourceDenom
     "
   >
     Select the token you want to use
@@ -13,133 +21,27 @@
   <div
     class="col-12 title-text"
     *ngIf="
-      this.selectedOriginChain && selectedSourceDenom && !selectedExitDenom
+      this.selectedOriginChain &&
+      selectedSourceDenom &&
+      selectedExitChain &&
+      !selectedExitDenom
     "
   >
-    Select the token you want to receive on Juno Network
+    Select the token you want to receive on
+    {{ selectedExitChain.chain_name | uppercase }}
   </div>
   <div class="col-12 lg:col-3 search-container">
-    <span
-      class="p-input-icon-left"
-      *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
-    >
-      <i class="pi pi-search"></i>
-      <input
-        autofocus
-        type="text"
-        pInputText
-        [(ngModel)]="searchText"
-        (ngModelChange)="searchTextApplyFilter()"
-        (keyup)="selectChainWithEnter($event)"
-      />
-    </span>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="this.selectedOriginChain"
-    >
-      Get funds from: &nbsp;<span style="color: coral">{{
-        this.selectedOriginChain.chain_name | uppercase
-      }}</span>
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedOriginChain.logo_uri"
-      />
-      &nbsp;&nbsp;
-      <i class="pi pi-lock" style="font-size: 1.5rem"></i>
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
-    >
-      Use token: &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedSourceDenom.logo_uri"
-      />
-      &nbsp;
-      <span style="color: coral">{{
-        this.selectedSourceDenom.recommended_symbol | uppercase
-      }}</span>
-      &nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedSourceDenom()"
-        >replace</a
-      >
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="
-        this.selectedOriginChain &&
-        this.selectedSourceDenom &&
-        this.selectedExitChain
-      "
-    >
-      Get funds to: &nbsp;
-
-      <span style="color: coral">{{
-        this.selectedExitChain?.chain_name | uppercase
-      }}</span>
-      &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedExitChain?.logo_uri"
-      />
-
-      &nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedChain()"
-        >replace</a
-      >
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="
-        this.selectedOriginChain &&
-        this.selectedSourceDenom &&
-        this.selectedExitDenom
-      "
-    >
-      Receive token: &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedExitDenom.logo_uri"
-      />
-      &nbsp;
-      <span style="color: coral">{{
-        this.selectedExitDenom.recommended_symbol | uppercase
-      }}</span>
-      &nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedExitDenom()"
-        >replace</a
-      >
-    </div>
+    <app-trade-parameters-selection
+      [selectedOriginChain]="selectedOriginChain"
+      [selectedExitChain]="selectedExitChain"
+      [selectedSourceDenom]="selectedSourceDenom"
+      [selectedExitDenom]="selectedExitDenom"
+      [out]="true"
+      (removeSelectedChainEvent)="removeSelectedChain()"
+      (removeSelectedSourceDenomEvent)="removeSelectedSourceDenom()"
+      (removeSelectedExitDenomEvent)="removeSelectedExitDenom()"
+      (searchTextEvent)="searchText = $event"
+    ></app-trade-parameters-selection>
   </div>
 
   <div
@@ -410,7 +312,14 @@
     style="padding: 3rem"
     *ngIf="selectedOriginChain && selectedSourceDenom && selectedExitDenom"
   >
-    <div class="card">
+    <app-transaction-info
+      [previewInformation]="previewInformation"
+      [assets]="assets"
+      [chains]="chains"
+      [selectedSourceDenom]="selectedSourceDenom"
+      [selectedExitDenom]="selectedExitDenom"
+    ></app-transaction-info>
+    <!--  <div class="card">
       <p-accordion
         (activeIndexChange)="activeIndexChange($event)"
         [activeIndex]="activeIndex"
@@ -539,30 +448,9 @@
             </div>
           </div>
         </p-accordionTab>
-        <!-- <p-accordionTab header="Header II">
-          <p class="m-0">
-            Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-            accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-            quae ab illo inventore veritatis et quasi architecto beatae vitae
-            dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-            aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-            eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci
-            velit, sed quia non numquam eius modi.
-          </p>
-        </p-accordionTab>
-        <p-accordionTab header="Header III">
-          <p class="m-0">
-            At vero eos et accusamus et iusto odio dignissimos ducimus qui
-            blanditiis praesentium voluptatum deleniti atque corrupti quos
-            dolores et quas molestias excepturi sint occaecati cupiditate non
-            provident, similique sunt in culpa qui officia deserunt mollitia
-            animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis
-            est et expedita distinctio. Nam libero tempore, cum soluta nobis est
-            eligendi optio cumque nihil impedit quo minus.
-          </p>
-        </p-accordionTab> -->
+
       </p-accordion>
-    </div>
+    </div> -->
   </div>
 </div>
 <p-toast position="top-right" key="balances" [baseZIndex]="5000">

@@ -1,16 +1,35 @@
 <div class="header-container">
-  <div>
-    <p-button icon="pi  pi-home" class="home" severity="primary"></p-button>
-    <p-button icon="pi  pi-sign-in" class="in" severity="success"></p-button>
-    <p-button icon="pi  pi-sign-out" class="out" severity="success"></p-button>
+  <div class="shortcuts">
+    <p-button
+      (click)="routeToIntents()"
+      icon="pi  pi-home"
+      class="home"
+      [severity]="homeSeverity"
+    ></p-button>
+    <p-button
+      (click)="routeToSwapIn()"
+      icon="pi  pi-sign-in"
+      class="in"
+      [severity]="inSeverity"
+    ></p-button>
+    <p-button
+      (click)="routeToSwapOut()"
+      icon="pi  pi-sign-out"
+      class="out"
+      [severity]="outSeverity"
+    ></p-button>
+    <div
+      style="width: 25px; height: 25px; cursor: pointer"
+      (click)="verReceitas = !verReceitas"
+    ></div>
   </div>
-  <div class="card flex" style="align-items: center; flex-wrap: wrap">
+  <div
+    class="card flex"
+    style="align-items: center; flex-wrap: wrap; margin: 5px"
+  >
     <!--     <div class="col-12 lg:col-7"> -->
     <p class="m-0" *ngIf="walletService.wallet_primary && walletAddress !== ''">
-      <span
-        (click)="addToClipboard(walletAddress)"
-        class="connected-address"
-        style="color: #616161; padding-right: 1rem"
+      <span (click)="addToClipboard(walletAddress)" class="connected-address"
         ><i>{{ formatedWalletAddress }}</i></span
       >
     </p>
@@ -34,3 +53,57 @@
 </div>
 <p-toast></p-toast>
 <app-wallet-connect></app-wallet-connect>
+<p-dialog
+  header="Receita Polvo à Lagareira"
+  *ngIf="verReceitas"
+  [(visible)]="verReceitas"
+  [style]="{ width: '50vw' }"
+>
+  <div style="text-align: center">
+    <img
+      src="https://ruralea.com/wp-content/uploads/2022/12/15027813_635231179991786_2204416715802901996_n-min.jpg"
+      alt="Polvo à Lagareiro"
+      style="width: 50%"
+    />
+  </div>
+  <p><b>INGREDIENTES</b></p>
+  <p></p>
+  <p>1 polvo (cerca de 1,5 kg)</p>
+  <p>500 g de batatas pequenas para assar</p>
+  <p>1 cebola</p>
+  <p>4 dentes de alho</p>
+  <p>200 ml de azeite</p>
+  <p>1 folha de louro</p>
+  <p>qb de sal</p>
+  <p></p>
+  <p><b>PREPARAÇÃO</b></p>
+  <p></p>
+
+  <p>
+    Coloque o polvo numa panela grande e cubra-o com água. <br />
+    Tempere com sal, e adicione a folha de louro e a cebola inteira.<br />
+    Deixe cozer durante 45 minutos em lume brando.<br />
+    Lave as batatas muito bem.<br />
+    Escorra-as e coloque-as num tabuleiro.<br />
+    Salpique com sal grosso e leve ao forno, pré-aquecido a 180ºC, durante 40
+    minutos.<br />
+    Retire o forno da panela. Escorra-o e coloque-o num tabuleiro.<br />
+    Junte os alhos esmagados (com casca) e regue abundantemente com o azeite.<br />
+    Leve ao forno durante 15 minutos.<br />
+    Retire as batatas do forno e dê um murro a cada uma delas.<br />
+    Retire também o polvo do forno.<br />
+    Sirva o polvo com as batatas, tudo envolvido em azeite quente e alhos
+    esmagados.<br />
+  </p>
+
+  <p></p>
+  <p><b>DICAS</b></p>
+  <p></p>
+  <p>
+    Pode polvilhar o Polvo à Lagareiro com salsa picadas antes de servir.<br />
+    Se quiser acentuar um pouco mais o sabor, tempere o polvo com pimenta
+    branca.<br />
+    É essencial cozer o polvo juntamente com a cebola para que este fique bem
+    macio.
+  </p>
+</p-dialog>

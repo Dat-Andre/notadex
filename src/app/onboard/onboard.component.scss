@@ -1,13 +1,8 @@
-/* .container-base {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap;
-  height: 100%;
-  width: 100%;
-  margin-top: 10vh;
-} */
+@media (max-width: 500px) {
+  .container-base {
+    margin-top: 30px;
+  }
+}
 
 .question {
   font-size: 2.5rem;
@@ -23,6 +18,29 @@
 
 .wallet-cards.disabled {
   cursor: not-allowed;
+}
+
+.friends {
+  position: fixed;
+  right: 0;
+  margin-right: 20px;
+}
+
+.gotoeteternalFight {
+  display: block;
+  cursor: pointer;
+}
+
+.gotoeteternalFight:hover {
+  cursor: pointer;
+}
+
+@media (max-width: 1300px) {
+  .friends {
+    position: relative;
+    margin-right: 0;
+    margin-left: 22px;
+  }
 }
 
 :host ::ng-deep {
@@ -67,6 +85,16 @@
   }
   p-card.disabled-card div.p-card-title {
     color: #414141;
+  }
+
+  i.pi-gift {
+    font-size: 4rem;
+    cursor: pointer;
+    color: transparent;
+  }
+
+  i.pi-gift:hover {
+    color: coral;
   }
 }
 

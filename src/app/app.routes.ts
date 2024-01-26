@@ -24,4 +24,9 @@ export const routes: Routes = [
     component: SwapOutComponent,
     pathMatch: 'full',
   },
+  {
+    path: '**',
+    pathMatch: 'full',
+    redirectTo: 'intents',
+  },
 ];
