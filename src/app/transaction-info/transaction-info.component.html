@@ -9,6 +9,8 @@
           <img
             style="width: 25px; height: 25px; margin-left: 5px"
             [src]="this.selectedSourceDenom.logo_uri"
+            alt=""
+            onerror="this.style.display='none'"
           />
           <p class="m-0">
             Amount In
@@ -31,6 +33,8 @@
           <img
             style="width: 25px; height: 25px; margin-left: 5px"
             [src]="this.selectedExitDenom.logo_uri"
+            alt=""
+            onerror="this.style.display='none'"
           />
           <p class="m-0">
             Amount Out
@@ -68,11 +72,15 @@
                 }}<img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.chainSourceIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
                 &nbsp; to &nbsp;{{ event.chainExit | uppercase
                 }}<img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.chainExitIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
               </p>
               <p
@@ -83,10 +91,14 @@
                 <img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.swapDenomInIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
                 {{ event.swapDenomInName | uppercase }} &nbsp; to &nbsp;<img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.swapDenomOutIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
                 {{ event.swapDenomOutName | uppercase }}
               </p>
@@ -102,6 +114,8 @@
                 <img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.denomIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
                 {{ event.denomName }}
               </p>
@@ -115,6 +129,8 @@
                 <img
                   style="width: 25px; height: 25px; margin-left: 5px"
                   [src]="event.chainSourceIcon"
+                  alt=""
+                  onerror="this.style.display='none'"
                 />
                 {{ event.chainSource | uppercase }}
               </p>

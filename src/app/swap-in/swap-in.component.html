@@ -159,6 +159,8 @@
           [src]="
             chain.chain_id === OSMOSIS_CHAIN_ID ? OSMOSIS_LOGO : chain.logo_uri
           "
+          alt=""
+          onerror="this.style.display='none'"
         />
       </div>
     </div>
@@ -176,6 +178,8 @@
         <img
           style="width: 25px; height: 25px; margin-left: 5px"
           [src]="denom?.logo_uri"
+          alt=""
+          onerror="this.style.display='none'"
         />
         <span class="ellipsis-add"
           >${{ denom.recommended_symbol | uppercase }}</span
@@ -201,6 +205,8 @@
         <img
           style="width: 25px; height: 25px; margin-left: 5px"
           [src]="denom?.logo_uri"
+          alt=""
+          onerror="this.style.display='none'"
         />
         ${{ denom.recommended_symbol | uppercase }}
       </div>
@@ -239,6 +245,8 @@
       <img
         style="width: 25px; height: 25px; margin-left: 5px"
         [src]="this.selectedSourceDenom.logo_uri"
+        alt=""
+        onerror="this.style.display='none'"
       />
       &nbsp;
       <span style="color: coral">{{
