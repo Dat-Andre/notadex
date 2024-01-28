@@ -1,29 +1,16 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { SkipService } from './skip.service';
-import { ButtonModule } from 'primeng/button';
-import {
-  Asset,
-  Chain,
-  FungibleAssets,
-  RequestMessages,
-  SwapTransferRouteSummary,
-} from './skip';
-import { map, of, switchMap, tap } from 'rxjs';
-import {
-  MsgTransferEncodeObject,
-  SigningStargateClient,
-} from '@cosmjs/stargate';
-import { GasPrice } from '@cosmjs/stargate';
+
+import { Chain } from './skip';
+
 import { InjectionToken } from '@angular/core';
 import { WalletService } from './wallet.service';
-import { Buffer } from 'buffer';
-import * as chainRegistry from 'chain-registry';
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HeaderComponent } from './header/header.component';
-import { Footer } from 'primeng/api';
 import { FooterComponent } from './footer/footer.component';
+import { SwUpdate } from '@angular/service-worker';
+import { ConfirmationService } from 'primeng/api';
 
 export const WINDOW = new InjectionToken<Window>('Global window object', {
   factory: () => window,
@@ -39,6 +26,7 @@ export const WINDOW = new InjectionToken<Window>('Global window object', {
     RouterLinkActive,
     HeaderComponent,
     FooterComponent,
+    ConfirmDialogModule,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -48,9 +36,32 @@ export class AppComponent implements OnInit {
   log_result!: Chain[];
 
   constructor(
-    private skip_service: SkipService,
-    public walletService: WalletService
+    public walletService: WalletService,
+    private swUpdate: SwUpdate,
+    private confirmationService: ConfirmationService
   ) {}
 
-  async ngOnInit(): Promise<void> {}
+  ngOnInit(): void {
+    this.swUpdate.versionUpdates.subscribe((event) => {
+      if (event.type === 'VERSION_READY') {
+        window.location.reload();
+      }
+    });
+  }
+
+  askForRefreash(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'There is a new version available. Would you like to update?',
+      header: 'Update Available',
+      icon: 'pi pi-exclamation-triangle',
+      acceptIcon: 'none',
+      rejectIcon: 'none',
+      rejectButtonStyleClass: 'p-button-text',
+      accept: () => {
+        window.location.reload();
+      },
+      reject: () => {},
+    });
+  }
 }

@@ -234,7 +234,7 @@ export class SwapInComponent implements OnInit {
       this.chains = res.chains;
       this.filteredChains = [...this.chains];
 
-      this.wallet_service.walletConnected.subscribe(async (val) => {
+      this.wallet_service.walletConnected.subscribe(async (val: boolean) => {
         this.reloadAfterWalletConnectionOrAccountChange(val);
       });
     });
@@ -564,8 +564,7 @@ export class SwapInComponent implements OnInit {
             severity: 'error',
             summary: 'Result',
             detail:
-              'Something went wrong... ' + '[' + err?.error?.message ??
-              'Não sei o que se passa' + ']',
+              'Something went wrong... ' + '[' + err?.error?.message + ']',
             life: 50000,
           });
           console.log(err);

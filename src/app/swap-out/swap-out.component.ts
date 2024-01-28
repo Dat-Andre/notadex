@@ -587,8 +587,7 @@ export class SwapOutComponent implements OnInit {
             severity: 'error',
             summary: 'Result',
             detail:
-              'Something went wrong... ' + '[' + err?.error?.message ??
-              'Não sei o que se passa' + ']',
+              'Something went wrong... ' + '[' + err?.error?.message + ']',
             life: 50000,
           });
           console.log(err);

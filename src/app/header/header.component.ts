@@ -62,7 +62,7 @@ export class HeaderComponent implements OnInit {
     private router: Router
   ) {}
   ngOnInit(): void {
-    this.walletService.walletConnected.subscribe(async (val) => {
+    this.walletService.walletConnected.subscribe(async (val: any) => {
       if (val) {
         this.reloadAfterWalletConnectionOrAccountChange();
       } else {
