@@ -7,6 +7,7 @@ import {
   BankSendWrapper,
   Chain,
   FungibleAssets,
+  StatusInformation,
   SwapTransferRouteSummary,
   SwapWrapper,
   TransferWrapper,
@@ -22,6 +23,31 @@ import { TimelineModule } from 'primeng/timeline';
 })
 export class TransactionInfoComponent implements OnInit {
   private _previewInformation: SwapTransferRouteSummary | undefined;
+
+  private _statusInformation: StatusInformation | undefined;
+
+  private _ongoingTracking = false;
+  public get ongoingTracking() {
+    return this._ongoingTracking;
+  }
+  @Input()
+  public set ongoingTracking(value) {
+    this._ongoingTracking = value;
+    if (!value) {
+      this.statusInformation = undefined;
+      //this.eve
+    }
+  }
+
+  @Input()
+  public set statusInformation(value: StatusInformation | undefined) {
+    console.log(value);
+    this._statusInformation = value;
+    this.updateIconsOnEvents();
+  }
+  public get statusInformation(): StatusInformation | undefined {
+    return this._statusInformation;
+  }
 
   @Input() assets: FungibleAssets | undefined;
 
@@ -61,7 +87,7 @@ export class TransactionInfoComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.activeIndexChange(0);
   }
 
   getNumberFromString(string: string, decimals: number | null): number | null {
@@ -88,6 +114,36 @@ export class TransactionInfoComponent implements OnInit {
     }
 
     return Number(stringBalance);
+  }
+
+  updateIconsOnEvents() {
+    let currentIdxTransfer = 0;
+
+    if (!this.statusInformation) return;
+
+    if (this.statusInformation.next_blocking_transfer) {
+      const idxNextBlockedTransfer =
+        this.statusInformation.next_blocking_transfer.transfer_sequence_index;
+
+      this.events.map((event) => {
+        if (idxNextBlockedTransfer > currentIdxTransfer) {
+          event.icon = 'pi pi-check-circle';
+          if (event.operationType === 'Transfer') {
+            currentIdxTransfer++;
+          }
+        }
+      });
+    } else if (this.statusInformation.state === 'STATE_COMPLETED_SUCCESS') {
+      this.events.map((event) => {
+        event.icon = 'pi pi-check-circle';
+      });
+    } else if (this.statusInformation.state === 'STATE_COMPLETED_ERROR') {
+      this.events.map((event) => {
+        if (event.icon === 'pi pi-spin pi-spinner') {
+          event.icon = 'pi pi-exclamation-circle';
+        }
+      });
+    }
   }
 
   createEventsObjectFromOperations(
@@ -228,4 +284,6 @@ export class EventItem {
   swapDenomOutName?: string;
   swapDenomInIcon?: string;
   swapDenomOutIcon?: string;
+  icon: string = 'pi pi-spin pi-spinner';
+  next_blocking_transfer: number = 0;
 }

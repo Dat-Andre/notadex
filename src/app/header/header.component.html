@@ -5,19 +5,37 @@
       icon="pi  pi-home"
       class="home"
       [severity]="homeSeverity"
+      [pTooltip]="tooltipHome"
     ></p-button>
     <p-button
       (click)="routeToSwapIn()"
       icon="pi  pi-sign-in"
       class="in"
       [severity]="inSeverity"
+      [pTooltip]="tooltipGetin"
     ></p-button>
     <p-button
       (click)="routeToSwapOut()"
       icon="pi  pi-sign-out"
       class="out"
       [severity]="outSeverity"
+      [pTooltip]="tooltipGetOut"
     ></p-button>
+    <ng-template #tooltipHome>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to Home </span>
+      </div>
+    </ng-template>
+    <ng-template #tooltipGetin>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to get IN </span>
+      </div>
+    </ng-template>
+    <ng-template #tooltipGetOut>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to get OUT </span>
+      </div>
+    </ng-template>
     <div
       style="width: 25px; height: 25px; cursor: pointer"
       (click)="verReceitas = !verReceitas"
@@ -62,8 +80,9 @@
   <div style="text-align: center">
     <img
       src="https://ruralea.com/wp-content/uploads/2022/12/15027813_635231179991786_2204416715802901996_n-min.jpg"
-      alt="Polvo à Lagareiro"
       style="width: 50%"
+      alt=""
+      onerror="this.style.display='none'"
     />
   </div>
   <p><b>INGREDIENTES</b></p>

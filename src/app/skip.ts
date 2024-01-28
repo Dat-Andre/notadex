@@ -203,3 +203,44 @@ export interface Message {
   msg: string;
   msg_type_url: string;
 }
+
+export interface StatusInformation {
+  transfers: Transfer[];
+  state: string;
+  transfer_sequence: Transfersequence[];
+  next_blocking_transfer: NextblockingTransfer;
+  transfer_asset_release?: any;
+  error?: any;
+  status: string;
+}
+export interface Transfer {
+  state: string;
+  transfer_sequence: Transfersequence[];
+  next_blocking_transfer: NextblockingTransfer;
+  transfer_asset_release?: any;
+  error?: any;
+}
+export interface NextblockingTransfer {
+  transfer_sequence_index: number;
+}
+export interface Transfersequence {
+  ibc_transfer: Ibctransfer;
+}
+export interface Ibctransfer {
+  src_chain_id: string;
+  dst_chain_id: string;
+  state: string;
+  packet_txs: PacketTxs;
+}
+export interface PacketTxs {
+  send_tx: Sendtx;
+  receive_tx?: Sendtx;
+  acknowledge_tx?: any;
+  timeout_tx?: any;
+  error?: any;
+}
+export interface Sendtx {
+  chain_id: string;
+  tx_hash: string;
+  explorer_link: string;
+}

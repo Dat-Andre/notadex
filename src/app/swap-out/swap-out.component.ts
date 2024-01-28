@@ -36,6 +36,7 @@ import {
   SwapTransferRouteSummary,
   FungibleAssets,
   RequestMessages,
+  StatusInformation,
 } from '../skip';
 import { SkipService } from '../skip.service';
 import { WalletService } from '../wallet.service';
@@ -75,12 +76,6 @@ import { LogsService } from '../logs.service';
   styleUrl: './swap-out.component.scss',
 })
 export class SwapOutComponent implements OnInit {
-  activeIndex: number | undefined = 0;
-
-  activeIndexChange(index: any) {
-    this.activeIndex = index;
-  }
-
   @HostListener('window:keplr_keystorechange', ['$event'])
   @HostListener('window:leap_keystorechange', ['$event'])
   onKeyStoreChange(event: any) {
@@ -101,12 +96,15 @@ export class SwapOutComponent implements OnInit {
   routesChecked = false;
   destinyWalletAddressCheck = false;
   loading = false;
+  ongoingTracking = false;
   private _sourceAmount: number = 0;
   public get sourceAmount(): number {
     return this._sourceAmount;
   }
   public set sourceAmount(value: number) {
     this._sourceAmount = value;
+    this.ongoingTracking = false;
+    if (!value || value === 0) return;
     this.checkIfNecessaryToGetSourceDenomBalance();
     this.getRouteAndExitAmount();
   }
@@ -173,6 +171,14 @@ export class SwapOutComponent implements OnInit {
     }
   }
 
+  private _statusInformation!: StatusInformation | undefined;
+  public get statusInformation(): StatusInformation | undefined {
+    return this._statusInformation;
+  }
+  public set statusInformation(value: StatusInformation | undefined) {
+    this._statusInformation = value;
+  }
+
   get availableDenoms(): Asset[] {
     return this._availableDenoms;
   }
@@ -185,10 +191,14 @@ export class SwapOutComponent implements OnInit {
     return this._searchText;
   }
   set searchText(val: string) {
+    console.log(val);
     this._searchText = val;
-    if (!this.selectedOriginChain) {
+    if (this.selectedSourceDenom) {
       this.filteredChains = this.filter.transform(this.chains, this.searchText);
-    } else if (this.selectedOriginChain) {
+    } else if (
+      (this.selectedOriginChain && !this.selectedSourceDenom) ||
+      (this.selectedExitChain && !this.selectedExitDenom)
+    ) {
       this.filteredDenoms = this.filterDenoms.transform(
         this.availableDenoms,
         this.searchText
@@ -266,9 +276,32 @@ export class SwapOutComponent implements OnInit {
       } else if (
         this.selectedOriginChain &&
         this.selectedSourceDenom &&
+        !this.selectedExitChain &&
         !this.selectedExitDenom
       ) {
-        this.getBalances(this.selectedOriginChain.chain_id);
+        const address = await this.wallet_service.getAddressForChain(
+          this.selectedOriginChain.chain_id
+        );
+        this.getBalance(
+          this.selectedOriginChain.chain_id,
+          address,
+          this.selectedSourceDenom
+        );
+      } else if (
+        this.selectedOriginChain &&
+        this.selectedSourceDenom &&
+        this.selectedExitChain &&
+        !this.selectedExitDenom
+      ) {
+        this.getBalances(this.selectedExitChain.chain_id);
+        const address = await this.wallet_service.getAddressForChain(
+          this.selectedOriginChain.chain_id
+        );
+        this.getBalance(
+          this.selectedOriginChain.chain_id,
+          address,
+          this.selectedSourceDenom
+        );
       } else if (
         this.selectedOriginChain &&
         this.selectedSourceDenom &&
@@ -282,10 +315,20 @@ export class SwapOutComponent implements OnInit {
           address,
           this.selectedSourceDenom
         );
+        if (this.selectedExitChain) {
+          const address = await this.wallet_service.getAddressForChain(
+            this.selectedExitChain.chain_id
+          );
+          this.getBalance(
+            this.selectedExitChain.chain_id,
+            address,
+            this.selectedExitDenom
+          );
+        }
       }
     } else {
       this.resetChecks();
-      this.availableDenoms.forEach((denom) => (denom.balance = 0));
+      this.availableDenoms?.forEach((denom) => (denom.balance = 0));
       this.filteredDenoms = [...this.availableDenoms];
     }
   }
@@ -371,13 +414,15 @@ export class SwapOutComponent implements OnInit {
   }
 
   async getBalances(chainId?: string) {
-    if (
-      !this.selectedOriginChain ||
-      !this.wallet_service.wallet_primary_connected
-    ) {
+    if (!this.selectedOriginChain || (!chainId && !this.selectedOriginChain)) {
       return;
     }
-    if (!chainId && !this.selectedOriginChain) {
+    if (!this.wallet_service.wallet_primary_connected) {
+      this.availableDenoms.map((denom) => {
+        if (denom.balance === undefined) {
+          denom.balance = 0;
+        }
+      });
       return;
     }
     console.log(chainId);
@@ -413,7 +458,7 @@ export class SwapOutComponent implements OnInit {
           continue;
         }
         if (balances) {
-          balances.forEach((balance) => {
+          balances?.forEach((balance) => {
             const denom = this.availableDenoms.find(
               (denom) => denom.denom === balance.denom
             );
@@ -430,6 +475,11 @@ export class SwapOutComponent implements OnInit {
               const balanceAsNumber = Number(stringBalance);
               denom.balance = balanceAsNumber;
             }
+            this.availableDenoms.map((denom) => {
+              if (denom.balance === undefined) {
+                denom.balance = 0;
+              }
+            });
           });
           //console.log(balances);
           this.filteredDenoms = [
@@ -537,8 +587,7 @@ export class SwapOutComponent implements OnInit {
             severity: 'error',
             summary: 'Result',
             detail:
-              'Something went wrong... ' + '[' + err?.error?.message ??
-              'Não sei o que se passa' + ']',
+              'Something went wrong... ' + '[' + err?.error?.message + ']',
             life: 50000,
           });
           console.log(err);
@@ -771,6 +820,7 @@ export class SwapOutComponent implements OnInit {
             detail: 'Transaction delivered',
             life: 2000,
           });
+          this.ongoingTracking = true;
           this.trackTxAndCheckStatus(deliverTxResponse);
         } else if (deliverTxResponse) {
           console.log(deliverTxResponse);
@@ -778,7 +828,7 @@ export class SwapOutComponent implements OnInit {
             severity: 'error',
             summary: 'Result',
             detail:
-              'Something went wrong... ' + '[' + deliverTxResponse.rawLog + ']',
+              'Something went wrong... It is probably an RPC provider issue. Try again.',
             life: 5000,
           });
         }
@@ -828,6 +878,7 @@ export class SwapOutComponent implements OnInit {
             this.logsService
               .postLog('Inititate Tracking', address, err)
               .subscribe((res) => console.log(res));
+            //this.ongoingTracking = false;
           }
         );
     }, 5000);
@@ -852,6 +903,7 @@ export class SwapOutComponent implements OnInit {
         }),
         first((res) => {
           console.log(res);
+          this.statusInformation = res;
           if (
             res !== undefined &&
             (res.state === 'STATE_PENDING' ||
@@ -906,8 +958,8 @@ export class SwapOutComponent implements OnInit {
               .postLog('Tracking Process', address, res)
               .subscribe((res) => console.log(res));
           }
-
-          if (
+          //this.ongoingTracking = false;
+          /* if (
             this.selectedOriginChain &&
             this.selectedSourceDenom &&
             this.selectedExitDenom
@@ -920,7 +972,7 @@ export class SwapOutComponent implements OnInit {
               address,
               this.selectedSourceDenom
             );
-          }
+          } */
         },
         async (err) => {
           this.messageService.clear('broadcast');
@@ -930,6 +982,7 @@ export class SwapOutComponent implements OnInit {
             detail: 'Something went wrong while tracking the transation...',
             life: 5000,
           });
+          //this.ongoingTracking = false;
           let address;
           if (this.selectedOriginChain) {
             address = await this.wallet_service.getAddressForChain(
@@ -1073,7 +1126,7 @@ export class SwapOutComponent implements OnInit {
     }
 
     let idxAdditionalForTransfersPreSwap = 1;
-    operations.forEach((operation) => {
+    operations?.forEach((operation) => {
       //console.log(Object.keys(operation));
       const event = new EventItem();
       if (Object.keys(operation)[0] === 'transfer') {
@@ -1096,8 +1149,8 @@ export class SwapOutComponent implements OnInit {
               idxOfOperation + idxAdditionalForTransfersPreSwap
             ] === chain.chain_id
         );
-        keys.forEach((key) => {
-          this.assets?.chain_to_assets_map[key].assets.find((asset) => {
+        keys?.forEach((key) => {
+          this.assets?.chain_to_assets_map[key].assets?.find((asset) => {
             if (
               // @ts-ignore
               asset.denom === operation.transfer?.dest_denom
@@ -1138,7 +1191,7 @@ export class SwapOutComponent implements OnInit {
         let swapDenomIn: Asset;
         let swapDenomOut: Asset;
         keys.forEach((key) => {
-          this.assets?.chain_to_assets_map[key].assets.forEach((asset) => {
+          this.assets?.chain_to_assets_map[key].assets?.forEach((asset) => {
             if (
               // @ts-ignore
               asset.denom ===
