@@ -28,6 +28,7 @@ export const WINDOW = new InjectionToken<Window>('Global window object', {
     FooterComponent,
     ConfirmDialogModule,
   ],
+  providers: [ConfirmationService, SwUpdate],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
