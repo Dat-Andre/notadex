@@ -19,6 +19,7 @@ import {
   Chain,
   FungibleAssets,
   RequestMessages,
+  StatusInformation,
   SwapTransferRouteSummary,
   SwapWrapper,
   TransferWrapper,
@@ -44,6 +45,7 @@ import { Observable, first, interval, switchMap, take, tap } from 'rxjs';
 import { fromBech32 } from '@cosmjs/encoding';
 import { TransactionInfoComponent } from '../transaction-info/transaction-info.component';
 import { TradeParametersSelectionComponent } from '../trade-parameters-selection/trade-parameters-selection.component';
+import { LogsService } from '../logs.service';
 
 @Component({
   selector: 'app-swap-in',
@@ -76,12 +78,6 @@ import { TradeParametersSelectionComponent } from '../trade-parameters-selection
   styleUrl: './swap-in.component.scss',
 })
 export class SwapInComponent implements OnInit {
-  activeIndex: number | undefined = 0;
-
-  activeIndexChange(index: any) {
-    this.activeIndex = index;
-  }
-
   @HostListener('window:keplr_keystorechange', ['$event'])
   @HostListener('window:leap_keystorechange', ['$event'])
   onKeyStoreChange(event: any) {
@@ -102,12 +98,15 @@ export class SwapInComponent implements OnInit {
   routesChecked = false;
   destinyWalletAddressCheck = false;
   loading = false;
+  ongoingTracking = false;
   private _sourceAmount: number = 0;
   public get sourceAmount(): number {
     return this._sourceAmount;
   }
   public set sourceAmount(value: number) {
     this._sourceAmount = value;
+    this.ongoingTracking = false;
+    if (!value || value === 0) return;
     this.checkIfNecessaryToGetSourceDenomBalance();
     this.getRouteAndExitAmount();
   }
@@ -162,6 +161,13 @@ export class SwapInComponent implements OnInit {
   }
   private _searchText: string = '';
   private _availableDenoms!: Asset[];
+  private _statusInformation: StatusInformation | undefined;
+  public get statusInformation(): StatusInformation | undefined {
+    return this._statusInformation;
+  }
+  public set statusInformation(value: StatusInformation) {
+    this._statusInformation = value;
+  }
   private _previewInformation: SwapTransferRouteSummary | undefined;
   public get previewInformation(): SwapTransferRouteSummary | undefined {
     return this._previewInformation;
@@ -179,7 +185,7 @@ export class SwapInComponent implements OnInit {
   }
 
   set availableDenoms(val: Asset[]) {
-    this._availableDenoms = val.sort((a, b) => a.balance - b.balance);
+    this._availableDenoms = val.sort((a, b) => a?.balance - b?.balance);
   }
 
   get searchText(): string {
@@ -203,7 +209,8 @@ export class SwapInComponent implements OnInit {
     public wallet_service: WalletService,
     private filter: ChainsFilterPipe,
     private filterDenoms: DenomsFilterPipe,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private logsService: LogsService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -266,9 +273,18 @@ export class SwapInComponent implements OnInit {
       } else if (
         this.selectedOriginChain &&
         this.selectedSourceDenom &&
+        this.selectedExitChain &&
         !this.selectedExitDenom
       ) {
-        this.getBalances(this.selectedOriginChain.chain_id);
+        this.getBalances(this.selectedExitChain.chain_id);
+        const address = await this.wallet_service.getAddressForChain(
+          this.selectedOriginChain.chain_id
+        );
+        this.getBalance(
+          this.selectedOriginChain.chain_id,
+          address,
+          this.selectedSourceDenom
+        );
       } else if (
         this.selectedOriginChain &&
         this.selectedSourceDenom &&
@@ -282,10 +298,20 @@ export class SwapInComponent implements OnInit {
           address,
           this.selectedSourceDenom
         );
+        if (this.selectedExitChain) {
+          const address = await this.wallet_service.getAddressForChain(
+            this.selectedExitChain.chain_id
+          );
+          this.getBalance(
+            this.selectedExitChain.chain_id,
+            address,
+            this.selectedExitDenom
+          );
+        }
       }
     } else {
       this.resetChecks();
-      this.availableDenoms.forEach((denom) => (denom.balance = 0));
+      this.availableDenoms?.forEach((denom) => (denom.balance = 0));
       this.filteredDenoms = [...this.availableDenoms];
     }
   }
@@ -364,13 +390,15 @@ export class SwapInComponent implements OnInit {
   }
 
   async getBalances(chainId?: string) {
-    if (
-      !this.selectedOriginChain ||
-      !this.wallet_service.wallet_primary_connected
-    ) {
+    if (!this.selectedOriginChain || (!chainId && !this.selectedOriginChain)) {
       return;
     }
-    if (!chainId && !this.selectedOriginChain) {
+    if (!this.wallet_service.wallet_primary_connected) {
+      this.availableDenoms.map((denom) => {
+        if (denom.balance === undefined) {
+          denom.balance = 0;
+        }
+      });
       return;
     }
     console.log(chainId);
@@ -406,7 +434,7 @@ export class SwapInComponent implements OnInit {
           continue;
         }
         if (balances) {
-          balances.forEach((balance) => {
+          balances?.forEach((balance) => {
             const denom = this.availableDenoms.find(
               (denom) => denom.denom === balance.denom
             );
@@ -423,6 +451,11 @@ export class SwapInComponent implements OnInit {
               const balanceAsNumber = Number(stringBalance);
               denom.balance = balanceAsNumber;
             }
+            this.availableDenoms.map((denom) => {
+              if (denom.balance === undefined) {
+                denom.balance = 0;
+              }
+            });
           });
           //console.log(balances);
           this.filteredDenoms = [
@@ -446,12 +479,12 @@ export class SwapInComponent implements OnInit {
     let rpcList = ChainRegistry.chains.find(
       (chain) => chain.chain_id === chainId
     )?.apis?.rpc;
-    this.messageService.add({
+    /* this.messageService.add({
       key: 'balances',
       sticky: true,
       severity: 'info',
       summary: 'Trying to find a RPC provider that works...',
-    });
+    }); */
     if (rpcList) {
       //console.log(rpcList);
       rpcList = this.shuffleArray(rpcList);
@@ -464,6 +497,7 @@ export class SwapInComponent implements OnInit {
           console.log(err);
           continue;
         }
+        console.log(balance);
         if (balance) {
           const totalChars = balance.amount.length;
           const decimals = denom.decimals ? denom.decimals : 0;
@@ -479,7 +513,7 @@ export class SwapInComponent implements OnInit {
         }
       }
     }
-    this.messageService.clear('balances');
+    //this.messageService.clear('balances');
   }
 
   getRouteAndExitAmount() {
@@ -780,6 +814,7 @@ export class SwapInComponent implements OnInit {
             detail: 'Transaction delivered',
             life: 2000,
           });
+          this.ongoingTracking = true;
           this.trackTxAndCheckStatus(deliverTxResponse);
         } else if (deliverTxResponse) {
           console.log(deliverTxResponse);
@@ -787,7 +822,7 @@ export class SwapInComponent implements OnInit {
             severity: 'error',
             summary: 'Result',
             detail:
-              'Something went wrong... ' + '[' + deliverTxResponse.rawLog + ']',
+              'Something went wrong... It is probably an RPC provider issue. Try again.',
             life: 5000,
           });
         }
@@ -815,11 +850,30 @@ export class SwapInComponent implements OnInit {
         )
         .subscribe((res) => {
           if (!this.selectedOriginChain) return;
+          //this.ongoingTracking = true;
           this.executeCheckStatusLoop(
             res.tx_hash,
             this.selectedOriginChain?.chain_id
           );
-        });
+        }),
+        async (err: any) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Result',
+            detail: 'Something went wrong setting up the Tx tracking... ',
+            life: 5000,
+          });
+          let address;
+          if (this.selectedOriginChain) {
+            address = await this.wallet_service.getAddressForChain(
+              this.selectedOriginChain?.chain_id
+            );
+          }
+          this.logsService
+            .postLog('Inititate Tracking', address, err)
+            .subscribe((res) => console.log(res));
+          //this.ongoingTracking = false;
+        };
     }, 5000);
   }
 
@@ -841,6 +895,7 @@ export class SwapInComponent implements OnInit {
           return this.checkTxStatus(txHash, chainId);
         }),
         first((res) => {
+          this.statusInformation = res;
           console.log(res);
           if (
             res !== undefined &&
@@ -875,6 +930,7 @@ export class SwapInComponent implements OnInit {
               detail: 'Nice! Transaction completed successfully!',
               life: 3000,
             });
+            //this.ongoingTracking = false;
           } else if (
             res !== undefined &&
             res.state === 'STATE_COMPLETED_ERROR'
@@ -886,9 +942,19 @@ export class SwapInComponent implements OnInit {
                 'The initial transaction or a subsequent transfer failed and lifecycle tracking has concluded.',
               life: 5000,
             });
+            //this.ongoingTracking = false;
+            let address;
+            if (this.selectedOriginChain) {
+              address = await this.wallet_service.getAddressForChain(
+                this.selectedOriginChain?.chain_id
+              );
+            }
+            this.logsService
+              .postLog('Tracking Process', address, res)
+              .subscribe((res) => console.log(res));
           }
 
-          if (
+          /* if (
             this.selectedOriginChain &&
             this.selectedSourceDenom &&
             this.selectedExitDenom
@@ -901,9 +967,9 @@ export class SwapInComponent implements OnInit {
               address,
               this.selectedSourceDenom
             );
-          }
+          } */
         },
-        (err) => {
+        async (err) => {
           this.messageService.clear('broadcast');
           this.messageService.add({
             severity: 'error',
@@ -911,6 +977,16 @@ export class SwapInComponent implements OnInit {
             detail: 'Something went wrong while tracking the transation...',
             life: 5000,
           });
+          let address;
+          if (this.selectedOriginChain) {
+            address = await this.wallet_service.getAddressForChain(
+              this.selectedOriginChain?.chain_id
+            );
+          }
+          //this.ongoingTracking = false;
+          this.logsService
+            .postLog('Tracking Process', address, err)
+            .subscribe((res) => console.log(res));
           console.log(err);
         }
       );
@@ -1045,7 +1121,7 @@ export class SwapInComponent implements OnInit {
     }
 
     let idxAdditionalForTransfersPreSwap = 1;
-    operations.forEach((operation) => {
+    operations?.forEach((operation) => {
       //console.log(Object.keys(operation));
       const event = new EventItem();
       if (Object.keys(operation)[0] === 'transfer') {
@@ -1068,7 +1144,7 @@ export class SwapInComponent implements OnInit {
               idxOfOperation + idxAdditionalForTransfersPreSwap
             ] === chain.chain_id
         );
-        keys.forEach((key) => {
+        keys?.forEach((key) => {
           this.assets?.chain_to_assets_map[key].assets.find((asset) => {
             if (
               // @ts-ignore
@@ -1109,8 +1185,8 @@ export class SwapInComponent implements OnInit {
         console.log(keys);
         let swapDenomIn: Asset;
         let swapDenomOut: Asset;
-        keys.forEach((key) => {
-          this.assets?.chain_to_assets_map[key].assets.forEach((asset) => {
+        keys?.forEach((key) => {
+          this.assets?.chain_to_assets_map[key].assets?.forEach((asset) => {
             if (
               // @ts-ignore
               asset.denom ===

@@ -5,19 +5,37 @@
       icon="pi  pi-home"
       class="home"
       [severity]="homeSeverity"
+      [pTooltip]="tooltipHome"
     ></p-button>
     <p-button
       (click)="routeToSwapIn()"
       icon="pi  pi-sign-in"
       class="in"
       [severity]="inSeverity"
+      [pTooltip]="tooltipGetin"
     ></p-button>
     <p-button
       (click)="routeToSwapOut()"
       icon="pi  pi-sign-out"
       class="out"
       [severity]="outSeverity"
+      [pTooltip]="tooltipGetOut"
     ></p-button>
+    <ng-template #tooltipHome>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to Home </span>
+      </div>
+    </ng-template>
+    <ng-template #tooltipGetin>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to get IN </span>
+      </div>
+    </ng-template>
+    <ng-template #tooltipGetOut>
+      <div style="color: #3d3d3d">
+        <span style="color: #3d3d3d"> Navigate to get OUT </span>
+      </div>
+    </ng-template>
     <div
       style="width: 25px; height: 25px; cursor: pointer"
       (click)="verReceitas = !verReceitas"

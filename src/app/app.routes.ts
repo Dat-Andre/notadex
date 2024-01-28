@@ -6,11 +6,11 @@ import { SwapOutComponent } from './swap-out/swap-out.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'intents',
+    redirectTo: 'home',
     pathMatch: 'full',
   },
   {
-    path: 'intents',
+    path: 'home',
     component: OnboardComponent,
     pathMatch: 'full',
   },
@@ -27,6 +27,6 @@ export const routes: Routes = [
   {
     path: '**',
     pathMatch: 'full',
-    redirectTo: 'intents',
+    redirectTo: 'home',
   },
 ];

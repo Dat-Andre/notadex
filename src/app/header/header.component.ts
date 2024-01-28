@@ -8,7 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { DialogModule } from 'primeng/dialog';
-import { LogsService } from '../logs.service';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-header',
@@ -19,6 +19,7 @@ import { LogsService } from '../logs.service';
     WalletConnectComponent,
     ToastModule,
     DialogModule,
+    TooltipModule,
   ],
   providers: [MessageService],
   templateUrl: './header.component.html',
@@ -81,7 +82,7 @@ export class HeaderComponent implements OnInit {
   }
 
   applySeverityLevelToNav(event: NavigationEnd) {
-    if (event.urlAfterRedirects === '/intents') {
+    if (event.urlAfterRedirects === '/home') {
       this.homeSeverity = 'primary';
       this.inSeverity = 'success';
       this.outSeverity = 'success';

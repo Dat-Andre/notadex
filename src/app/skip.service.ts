@@ -8,6 +8,7 @@ import {
   FungibleAssets,
   MessagesResponse,
   RequestMessages,
+  StatusInformation,
   SwapTransferRouteSummary,
   SwapVenue,
 } from './skip';
@@ -119,13 +120,16 @@ export class SkipService {
     });
   }
 
-  getTxStatus(txHash: string, chainId: string): Observable<any> {
+  getTxStatus(txHash: string, chainId: string): Observable<StatusInformation> {
     let params = new HttpParams();
     params = params.append('tx_hash', txHash).append('chain_id', chainId);
     //params.set('chain_id', chainId);
-    return this.http.get<any>(this.skip_api_base_v2 + 'tx/status', {
-      params,
-    });
+    return this.http.get<StatusInformation>(
+      this.skip_api_base_v2 + 'tx/status',
+      {
+        params,
+      }
+    );
   }
 
   getMessagesForSwapOrTransfer(

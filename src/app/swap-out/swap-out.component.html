@@ -41,6 +41,7 @@
       (removeSelectedSourceDenomEvent)="removeSelectedSourceDenom()"
       (removeSelectedExitDenomEvent)="removeSelectedExitDenom()"
       (searchTextEvent)="searchText = $event"
+      [statusInformation]="statusInformation"
     ></app-trade-parameters-selection>
   </div>
 
@@ -71,7 +72,7 @@
       </div>
       <div class="origin">
         Balance:
-        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+        {{ denom.balance | number : "1.2-20" }}
       </div>
       <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
     </div>
@@ -128,7 +129,7 @@
       </div>
       <div class="origin">
         Balance:
-        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+        {{ denom.balance | number : "1.2-20" }}
       </div>
       <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
     </div>
@@ -144,18 +145,23 @@
         inputId="locale-us"
         mode="decimal"
         locale="en-US"
+        [disabled]="
+          ongoingTracking &&
+          this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+          this.statusInformation?.state !== 'STATE_COMPLETED_ERROR'
+        "
         [minFractionDigits]="2"
         [maxFractionDigits]="10"
       >
       </p-inputNumber>
     </div>
     <div class="balance-swap-out space-up">
-      Available:&nbsp;<i
+      Available:&nbsp;<!-- <i
         class="pi pi-spin pi-spinner"
         *ngIf="
           !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
         "
-      ></i>
+      ></i> -->
       {{ this.selectedSourceDenom.balance | number : "1.2-20" }}
       &nbsp;
       <img
@@ -174,9 +180,13 @@
           class="amount-percentages"
           label="25%"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.25"
         ></p-button>
@@ -184,9 +194,13 @@
           label="50%"
           class="amount-percentages"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.5"
         ></p-button>
@@ -194,9 +208,13 @@
           class="amount-percentages"
           label="75%"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.75"
         ></p-button>
@@ -204,9 +222,13 @@
           class="amount-percentages"
           label="Max"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance"
         ></p-button>
@@ -308,7 +330,10 @@
             selectedExitDenom.denom === selectedSourceDenom.denom &&
             destinyWalletAddress === '' &&
             this.wallet_service.wallet_primary_connected) ||
-          addDestinyWallet
+          addDestinyWallet ||
+          (ongoingTracking &&
+            this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+            this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
         "
         [loading]="loading"
         (onClick)="executePreview()"
@@ -326,6 +351,8 @@
       [chains]="chains"
       [selectedSourceDenom]="selectedSourceDenom"
       [selectedExitDenom]="selectedExitDenom"
+      [statusInformation]="statusInformation"
+      [ongoingTracking]="ongoingTracking"
     ></app-transaction-info>
     <!--  <div class="card">
       <p-accordion

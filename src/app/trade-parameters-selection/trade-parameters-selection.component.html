@@ -1,21 +1,14 @@
+<div
+  style="margin-top: 5vh"
+  *ngIf="
+    selectedOriginChain &&
+    selectedExitChain &&
+    selectedSourceDenom &&
+    selectedExitDenom
+  "
+></div>
 <div *ngIf="in">
-  <span
-    class="p-input-icon-left"
-    *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
-  >
-    <i class="pi pi-search"></i>
-
-    <input autofocus type="text" pInputText [(ngModel)]="searchText" />
-  </span>
-  <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
-    *ngIf="this.selectedOriginChain"
-  >
+  <div class="chain-and-token" *ngIf="this.selectedOriginChain">
     Get funds from: &nbsp;<span style="color: coral">{{
       this.selectedOriginChain.chain_name | uppercase
     }}</span>
@@ -33,12 +26,7 @@
     >
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="chain-and-token"
     *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
   >
     Use token: &nbsp;
@@ -61,12 +49,22 @@
     >
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="balance"
+    *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+  >
+    Balance &nbsp;&nbsp;
+    <i style="color: #a64f2f">{{
+      this.selectedSourceDenom.balance | number : "1.2-20"
+    }}</i>
+  </div>
+  <div
+    class="chain-and-token"
+    *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+  >
+    <i class="pi pi-angle-down" style="font-size: 2rem; color: #8e8e8e"></i>
+  </div>
+  <div
+    class="chain-and-token"
     *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
   >
     Get funds to: &nbsp;
@@ -86,12 +84,7 @@
     <i class="pi pi-lock" style="font-size: 1.5rem"></i>
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="chain-and-token"
     *ngIf="
       this.selectedOriginChain &&
       this.selectedSourceDenom &&
@@ -117,24 +110,31 @@
       >replace</a
     >
   </div>
-</div>
-<div *ngIf="out">
+  <div
+    class="balance"
+    *ngIf="
+      this.selectedOriginChain &&
+      this.selectedSourceDenom &&
+      this.selectedExitDenom
+    "
+  >
+    Balance &nbsp;&nbsp;
+    <i style="color: #a64f2f">{{
+      this.selectedExitDenom.balance | number : "1.2-20"
+    }}</i>
+  </div>
   <span
     class="p-input-icon-left"
+    style="margin-top: 2rem"
     *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
   >
     <i class="pi pi-search"></i>
+
     <input autofocus type="text" pInputText [(ngModel)]="searchText" />
   </span>
-  <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
-    *ngIf="this.selectedOriginChain"
-  >
+</div>
+<div *ngIf="out">
+  <div class="chain-and-token" *ngIf="this.selectedOriginChain">
     Get funds from: &nbsp;<span style="color: coral">{{
       this.selectedOriginChain.chain_name | uppercase
     }}</span>
@@ -148,12 +148,7 @@
     <i class="pi pi-lock" style="font-size: 1.5rem"></i>
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="chain-and-token"
     *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
   >
     Use token: &nbsp;
@@ -176,12 +171,22 @@
     >
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="balance"
+    *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+  >
+    Balance &nbsp;&nbsp;
+    <i style="color: #a64f2f">{{
+      this.selectedSourceDenom.balance | number : "1.2-20"
+    }}</i>
+  </div>
+  <div
+    class="chain-and-token"
+    *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
+  >
+    <i class="pi pi-angle-down" style="font-size: 2rem; color: #8e8e8e"></i>
+  </div>
+  <div
+    class="chain-and-token"
     *ngIf="
       this.selectedOriginChain &&
       this.selectedSourceDenom &&
@@ -210,12 +215,7 @@
     >
   </div>
   <div
-    style="
-      display: flex;
-      align-items: center;
-      margin-top: 18px;
-      justify-content: center;
-    "
+    class="chain-and-token"
     *ngIf="
       this.selectedOriginChain &&
       this.selectedSourceDenom &&
@@ -233,7 +233,11 @@
     <span style="color: coral">{{
       this.selectedExitDenom.recommended_symbol | uppercase
     }}</span>
-    &nbsp;&nbsp;
+    &nbsp;
+    <i style="color: coral">{{
+      this.selectedExitDenom.balance | number : "1.2-2"
+    }}</i
+    >&nbsp;&nbsp;
     <a
       role="button"
       href="javascript:void(0);"
@@ -241,4 +245,25 @@
       >replace</a
     >
   </div>
+  <div
+    class="balance"
+    *ngIf="
+      this.selectedOriginChain &&
+      this.selectedSourceDenom &&
+      this.selectedExitDenom
+    "
+  >
+    Balance &nbsp;&nbsp;
+    <i style="color: #a64f2f">{{
+      this.selectedExitDenom.balance | number : "1.2-20"
+    }}</i>
+  </div>
+  <span
+    class="p-input-icon-left"
+    style="margin-top: 2rem"
+    *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
+  >
+    <i class="pi pi-search"></i>
+    <input autofocus type="text" pInputText [(ngModel)]="searchText" />
+  </span>
 </div>

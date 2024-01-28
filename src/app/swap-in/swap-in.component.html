@@ -29,122 +29,8 @@
       (removeSelectedSourceDenomEvent)="removeSelectedSourceDenom()"
       (removeSelectedExitDenomEvent)="removeSelectedExitDenom()"
       (searchTextEvent)="searchText = $event"
+      [statusInformation]="statusInformation"
     ></app-trade-parameters-selection>
-    <!-- <span
-      class="p-input-icon-left"
-      *ngIf="!selectedOriginChain || !selectedSourceDenom || !selectedExitDenom"
-    >
-      <i class="pi pi-search"></i>
-      <input
-        autofocus
-        type="text"
-        pInputText
-        [(ngModel)]="searchText"
-        (keyup)="selectChainWithEnter($event)"
-      />
-    </span>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="this.selectedOriginChain"
-    >
-      Get funds from: &nbsp;<span style="color: coral">{{
-        this.selectedOriginChain.chain_name | uppercase
-      }}</span>
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedOriginChain.logo_uri"
-      />&nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedChain()"
-        >replace</a
-      >
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
-    >
-      Use token: &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedSourceDenom.logo_uri"
-      />
-      &nbsp;
-      <span style="color: coral">{{
-        this.selectedSourceDenom.recommended_symbol | uppercase
-      }}</span>
-      &nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedSourceDenom()"
-        >replace</a
-      >
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="this.selectedOriginChain && this.selectedSourceDenom"
-    >
-      Get funds to: &nbsp;
-
-      <span style="color: coral">{{
-        this.selectedExitChain?.chain_name | uppercase
-      }}</span>
-      &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedExitChain?.logo_uri"
-      />
-
-      &nbsp;&nbsp;
-      <i class="pi pi-lock" style="font-size: 1.5rem"></i>
-    </div>
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-top: 18px;
-        justify-content: center;
-      "
-      *ngIf="
-        this.selectedOriginChain &&
-        this.selectedSourceDenom &&
-        this.selectedExitDenom
-      "
-    >
-      Receive token: &nbsp;
-      <img
-        style="width: 25px; height: 25px; margin-left: 5px"
-        [src]="this.selectedExitDenom.logo_uri"
-      />
-      &nbsp;
-      <span style="color: coral">{{
-        this.selectedExitDenom.recommended_symbol | uppercase
-      }}</span>
-      &nbsp;&nbsp;
-      <a
-        role="button"
-        href="javascript:void(0);"
-        (click)="removeSelectedExitDenom()"
-        >replace</a
-      >
-    </div> -->
   </div>
   <div class="col-12 lg:col-9 chains-container" *ngIf="!selectedOriginChain">
     <div
@@ -187,7 +73,7 @@
       </div>
       <div class="origin">
         Balance:
-        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+        {{ denom.balance | number : "1.2-20" }}
       </div>
       <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
     </div>
@@ -212,7 +98,7 @@
       </div>
       <div class="origin">
         Balance:
-        {{ (denom.balance ? denom.balance : 0) | number : "1.2-20" }}
+        {{ denom.balance | number : "1.2-20" }}
       </div>
       <div class="origin">Minted on: {{ denom.origin_chain_id }}</div>
     </div>
@@ -230,16 +116,21 @@
         locale="en-US"
         [minFractionDigits]="2"
         [maxFractionDigits]="10"
+        [disabled]="
+          ongoingTracking &&
+          this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+          this.statusInformation?.state !== 'STATE_COMPLETED_ERROR'
+        "
       >
       </p-inputNumber>
     </div>
     <div class="balance-swap-out space-up">
-      Available:&nbsp;<i
+      Available:&nbsp;<!-- <i
         class="pi pi-spin pi-spinner"
         *ngIf="
           !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
         "
-      ></i>
+      ></i> -->
       {{ this.selectedSourceDenom.balance | number : "1.2-20" }}
       &nbsp;
       <img
@@ -258,9 +149,13 @@
           class="amount-percentages"
           label="25%"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.25"
         ></p-button>
@@ -268,9 +163,13 @@
           label="50%"
           class="amount-percentages"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.5"
         ></p-button>
@@ -278,9 +177,13 @@
           class="amount-percentages"
           label="75%"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance * 0.75"
         ></p-button>
@@ -288,9 +191,13 @@
           class="amount-percentages"
           label="Max"
           [rounded]="true"
-          severity="warning"
+          severity="primary"
           [disabled]="
-            !selectedSourceDenom.balance || selectedSourceDenom.balance === 0
+            !selectedSourceDenom.balance ||
+            selectedSourceDenom.balance === 0 ||
+            (ongoingTracking &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+              this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
           "
           (click)="sourceAmount = this.selectedSourceDenom.balance"
         ></p-button>
@@ -391,7 +298,10 @@
             selectedExitDenom.denom === selectedSourceDenom.denom &&
             destinyWalletAddress === '' &&
             this.wallet_service.wallet_primary_connected) ||
-          addDestinyWallet
+          addDestinyWallet ||
+          (ongoingTracking &&
+            this.statusInformation?.state !== 'STATE_COMPLETED_SUCCESS' &&
+            this.statusInformation?.state !== 'STATE_COMPLETED_ERROR')
         "
         [loading]="loading"
         (onClick)="executePreview()"
@@ -409,138 +319,9 @@
       [chains]="chains"
       [selectedSourceDenom]="selectedSourceDenom"
       [selectedExitDenom]="selectedExitDenom"
+      [statusInformation]="statusInformation"
+      [ongoingTracking]="ongoingTracking"
     ></app-transaction-info>
-    <!-- <div class="card">
-      <p-accordion
-        (activeIndexChange)="activeIndexChange($event)"
-        [activeIndex]="activeIndex"
-      >
-        <p-accordionTab header="Preview" *ngIf="previewInformation">
-          <div class="grid">
-            <div class="col-12 lg:col-5">
-              <img
-                style="width: 25px; height: 25px; margin-left: 5px"
-                [src]="this.selectedSourceDenom.logo_uri"
-              />
-              <p class="m-0">
-                Amount In
-                <b style="color: coral">{{
-                  getNumberFromString(
-                    previewInformation.amount_in,
-                    selectedSourceDenom.decimals
-                  ) | number : "1.2-20"
-                }}</b
-                >&nbsp;<i>(${{ previewInformation.usd_amount_in }})</i>
-              </p>
-            </div>
-            <div
-              class="col-12 lg:col-2"
-              style="
-                display: flex;
-                align-items: center;
-                justify-content: center;
-              "
-            >
-              <i class="pi pi-sync" style="font-size: 1.3rem"></i>
-            </div>
-            <div class="col-12 lg:col-5">
-              <img
-                style="width: 25px; height: 25px; margin-left: 5px"
-                [src]="this.selectedExitDenom.logo_uri"
-              />
-              <p class="m-0">
-                Amount Out
-                <b style="color: coral">{{
-                  getNumberFromString(
-                    previewInformation.estimated_amount_out,
-                    selectedExitDenom.decimals
-                  ) | number : "1.2-20"
-                }}</b
-                >&nbsp;<i>(${{ previewInformation.usd_amount_out }})</i>
-              </p>
-            </div>
-            <div class="col-12">
-              <p class="m-0">
-                Estimated price impact
-                <b style="color: coral"
-                  >{{
-                    (previewInformation.swap_price_impact_percent
-                      ? previewInformation.swap_price_impact_percent
-                      : 0
-                    ) | number : "1.2-4"
-                  }}%</b
-                >&nbsp;
-              </p>
-            </div>
-            <div class="col-12 space-up" *ngIf="eventsFromEstimate">
-              <p-timeline [value]="events">
-                <ng-template pTemplate="content" let-event>
-                  <p
-                    class="m-0"
-                    style="display: flex; flex-wrap: wrap"
-                    *ngIf="event.operationType === 'Transfer'"
-                  >
-                    {{ event.chainSource | uppercase
-                    }}<img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.chainSourceIcon"
-                    />
-                    &nbsp; to &nbsp;{{ event.chainExit | uppercase
-                    }}<img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.chainExitIcon"
-                    />
-                  </p>
-                  <p
-                    class="m-0"
-                    style="display: flex; flex-wrap: wrap"
-                    *ngIf="event.operationType === 'Swap'"
-                  >
-                    <img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.swapDenomInIcon"
-                    />
-                    {{ event.swapDenomInName | uppercase }} &nbsp; to &nbsp;<img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.swapDenomOutIcon"
-                    />
-                    {{ event.swapDenomOutName | uppercase }}
-                  </p>
-                </ng-template>
-                <ng-template pTemplate="opposite" let-event>
-                  <p
-                    class="m-0 operation-type"
-                    style="display: flex; flex-wrap: wrap"
-                    *ngIf="event.operationType === 'Transfer'"
-                  >
-                    <b style="color: coral">{{ event.operationType }}</b
-                    >&nbsp;
-                    <img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.denomIcon"
-                    />
-                    {{ event.denomName }}
-                  </p>
-                  <p
-                    class="m-0 operation-type"
-                    style="display: flex; flex-wrap: wrap"
-                    *ngIf="event.operationType === 'Swap'"
-                  >
-                    <b style="color: coral">{{ event.operationType }}</b
-                    >&nbsp;
-                    <img
-                      style="width: 25px; height: 25px; margin-left: 5px"
-                      [src]="event.chainSourceIcon"
-                    />
-                    {{ event.chainSource | uppercase }}
-                  </p>
-                </ng-template>
-              </p-timeline>
-            </div>
-          </div>
-        </p-accordionTab>
-      </p-accordion>
-    </div> -->
   </div>
 </div>
 <p-toast position="top-right" key="balances" [baseZIndex]="5000">
