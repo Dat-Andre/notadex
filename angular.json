@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "baseHref": "https://dolphin-app-waqb6.ondigitalocean.app/",
+            "baseHref": "https://notadex.zone/",
             "outputPath": "dist/",
             "index": "src/index.html",
             "polyfills": ["zone.js"],
