@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AccordionModule } from 'primeng/accordion';
+import { TooltipModule } from 'primeng/tooltip';
 import {
   Asset,
   AxelarTransferWrapper,
@@ -17,7 +18,7 @@ import { TimelineModule } from 'primeng/timeline';
 @Component({
   selector: 'app-transaction-info',
   standalone: true,
-  imports: [CommonModule, AccordionModule, TimelineModule],
+  imports: [CommonModule, AccordionModule, TimelineModule, TooltipModule],
   templateUrl: './transaction-info.component.html',
   styleUrl: './transaction-info.component.scss',
 })
@@ -41,7 +42,7 @@ export class TransactionInfoComponent implements OnInit {
 
   @Input()
   public set statusInformation(value: StatusInformation | undefined) {
-    console.log(value);
+    /* console.log(value); */
     this._statusInformation = value;
     this.updateIconsOnEvents();
   }
@@ -174,7 +175,7 @@ export class TransactionInfoComponent implements OnInit {
           (chain) => chain.chain_id === operation.transfer?.chain_id
         );
         const idxOfOperation = operations.indexOf(operation);
-        console.log(this.previewInformation?.chain_ids);
+        /* console.log(this.previewInformation?.chain_ids); */
         const exitChain = this.chains.find(
           (chain) =>
             this.previewInformation?.chain_ids[
@@ -187,9 +188,9 @@ export class TransactionInfoComponent implements OnInit {
               // @ts-ignore
               asset.denom === operation.transfer?.dest_denom
             ) {
-              console.log(asset);
+              /* console.log(asset); */
               // @ts-ignore
-              console.log(operation.transfer?.dest_denom);
+              /* console.log(operation.transfer?.dest_denom); */
               assetInfo = asset;
             }
           });
@@ -213,13 +214,13 @@ export class TransactionInfoComponent implements OnInit {
         console.log(event);
       } else if (Object.keys(operation)[0] === 'swap') {
         event.operationType = 'Swap';
-        console.log(operation);
+        /* console.log(operation); */
         if (this.assets === undefined || !this.assets.chain_to_assets_map) {
           return;
         }
         const operationM = operation as SwapWrapper;
         const keys = Object.keys(this.assets?.chain_to_assets_map);
-        console.log(keys);
+        /* console.log(keys); */
         let swapDenomIn: Asset;
         let swapDenomOut: Asset;
         keys.forEach((key) => {
@@ -262,13 +263,16 @@ export class TransactionInfoComponent implements OnInit {
         event.swapDenomOutName = swapDenomOut?.name;
         // @ts-ignore
         event.swapDenomOutIcon = swapDenomOut?.logo_uri;
-        console.log(event);
+        /*  console.log(event); */
         if (idxAdditionalForTransfersPreSwap === 1) {
           idxAdditionalForTransfersPreSwap = 0;
         }
       }
       this.events.push(event);
     });
+  }
+  navigateToLink() {
+    window.open('https://skip.money/', '_blank');
   }
 }
 

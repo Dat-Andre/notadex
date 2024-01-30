@@ -123,17 +123,17 @@ export class HeaderComponent implements OnInit {
   }
 
   routeToSwapIn() {
-    console.log('routeToSwapIn');
+    /* console.log('routeToSwapIn'); */
     this.router.navigateByUrl('/in');
   }
 
   routeToSwapOut() {
-    console.log('routeToSwapOut');
+    /* console.log('routeToSwapOut'); */
     this.router.navigateByUrl('/out');
   }
 
   routeToIntents() {
-    console.log('routeToIntents');
+    /* console.log('routeToIntents'); */
     this.router.navigateByUrl('/intents');
   }
 

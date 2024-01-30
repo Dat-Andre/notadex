@@ -19,17 +19,21 @@ export class OnboardComponent {
   constructor(private router: Router) {}
 
   routeToSwapIn() {
-    console.log('routeToSwapIn');
+    /* console.log('routeToSwapIn'); */
     this.router.navigateByUrl('/in');
   }
 
   routeToSwapOut() {
-    console.log('routeToSwapOut');
+    /* console.log('routeToSwapOut'); */
     this.router.navigateByUrl('/out');
   }
 
   routeToIntents() {
-    console.log('routeToIntents');
+    /* console.log('routeToIntents'); */
     this.router.navigateByUrl('/intents');
+  }
+
+  navigateToLink() {
+    window.open('https://skip.money/', '_blank');
   }
 }

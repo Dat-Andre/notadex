@@ -136,7 +136,7 @@ export class SwapInComponent implements OnInit {
       value,
       this.selectedExitChain?.chain_id
     );
-    console.log('destinyWalletAddressCheck' + this.destinyWalletAddressCheck);
+    /* console.log('destinyWalletAddressCheck' + this.destinyWalletAddressCheck); */
   }
   private _addDestinyWallet = false;
   public get addDestinyWallet() {
@@ -214,14 +214,14 @@ export class SwapInComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    console.log(ChainRegistry.chains);
+    /* console.log(ChainRegistry.chains); */
 
     this.skip_service.getAllAvailableAssetsForAllChains().subscribe((res) => {
-      console.log(res);
+      /* console.log(res); */
       this.assets = res;
     });
     this.skip_service.getChains().subscribe((res) => {
-      console.log(res);
+      /* console.log(res); */
       const junoIndex = res.chains.findIndex(
         (chain) => chain.chain_id === this.JUNO_CHAIN_ID
       );
@@ -331,7 +331,7 @@ export class SwapInComponent implements OnInit {
   }
 
   selectChainWithEnter(event: any) {
-    console.log(this.chains);
+    /* console.log(this.chains); */
     if (event.keyCode !== 13) {
       return;
     }
@@ -341,21 +341,21 @@ export class SwapInComponent implements OnInit {
   }
 
   selectSourceChain(chain: Chain) {
-    console.log(chain);
+    /* console.log(chain); */
     this.selectedOriginChain = chain;
     this.searchText = '';
     this.getAvailableDenoms();
   }
 
   selectSourceDenom(denom: Asset) {
-    console.log(denom);
+    /* console.log(denom); */
     this.selectedSourceDenom = Object.assign({}, denom);
     this.searchText = '';
     this.getAvailableDenoms('juno-1');
   }
 
   async selectExitDenom(denom: Asset) {
-    console.log(denom);
+    /* console.log(denom); */
     if (this.selectedOriginChain)
       this.selectedExitDenom = Object.assign({}, denom);
     this.searchText = '';
@@ -375,7 +375,7 @@ export class SwapInComponent implements OnInit {
         chainId ? chainId : this.selectedOriginChain?.chain_id
       )
       .subscribe((res: FungibleAssets) => {
-        console.log(res);
+        /* console.log(res); */
         this.availableDenoms =
           res.chain_to_assets_map[
             chainId
@@ -401,8 +401,8 @@ export class SwapInComponent implements OnInit {
       });
       return;
     }
-    console.log(chainId);
-    console.log(this.selectedOriginChain);
+    /* console.log(chainId);
+    console.log(this.selectedOriginChain); */
     let rpcList = ChainRegistry.chains.find(
       (chain) =>
         chain.chain_id ===
@@ -417,9 +417,9 @@ export class SwapInComponent implements OnInit {
         summary: 'Trying to find a RPC provider that works...',
       });
 
-      console.log(rpcList);
+      /* console.log(rpcList); */
       rpcList = this.shuffleArray(rpcList);
-      console.log(rpcList);
+      /* console.log(rpcList); */
       for (const rpc of rpcList) {
         let balances;
 
@@ -439,34 +439,40 @@ export class SwapInComponent implements OnInit {
               (denom) => denom.denom === balance.denom
             );
             if (denom) {
-              const totalChars = balance.amount.length;
               const decimals = denom.decimals ? denom.decimals : 0;
+
+              while (balance.amount.length < decimals) {
+                // @ts-ignore
+                balance.amount = '0' + balance.amount;
+                /* console.log(balance.amount); */
+              }
+              const totalChars = balance.amount.length;
               const stringBalance =
                 balance.amount.substring(0, totalChars - decimals) +
                 '.' +
                 balance.amount.substring(totalChars - decimals);
-              console.log(
+              /* console.log(
                 'denom: ' + stringBalance + '; balance: ' + stringBalance
-              );
+              ); */
               const balanceAsNumber = Number(stringBalance);
               denom.balance = balanceAsNumber;
             }
-            this.availableDenoms.map((denom) => {
-              if (denom.balance === undefined) {
-                denom.balance = 0;
-              }
-            });
           });
-          //console.log(balances);
-          this.filteredDenoms = [
-            ...this.availableDenoms.sort(
-              (a, b) =>
-                (b.balance ? b.balance : 0) - (a.balance ? a.balance : 0)
-            ),
-          ];
+
           break;
         }
       }
+      this.availableDenoms.map((denom) => {
+        if (denom.balance === undefined) {
+          denom.balance = 0;
+        }
+      });
+      //console.log(balances);
+      this.filteredDenoms = [
+        ...this.availableDenoms.sort(
+          (a, b) => (b.balance ? b.balance : 0) - (a.balance ? a.balance : 0)
+        ),
+      ];
       this.messageService.clear();
     }
   }
@@ -475,7 +481,7 @@ export class SwapInComponent implements OnInit {
     if (adress === '' || denom === undefined) {
       return;
     }
-    console.log('getBalance');
+    /* console.log('getBalance'); */
     let rpcList = ChainRegistry.chains.find(
       (chain) => chain.chain_id === chainId
     )?.apis?.rpc;
@@ -494,13 +500,21 @@ export class SwapInComponent implements OnInit {
           const client = await StargateClient.connect(rpc.address);
           balance = await client.getBalance(adress, denom?.denom);
         } catch (err) {
-          console.log(err);
+          /* console.log(err); */
           continue;
         }
-        console.log(balance);
+        /* console.log(balance); */
         if (balance) {
-          const totalChars = balance.amount.length;
           const decimals = denom.decimals ? denom.decimals : 0;
+          while (balance.amount.length < decimals) {
+            // @ts-ignore
+            balance.amount = '0' + balance.amount;
+            /* console.log(balance.amount); */
+          }
+          const totalChars = balance.amount.length;
+          /* if(totalChars < decimals) {
+
+          } */
           const stringBalance =
             balance.amount.substring(0, totalChars - decimals) +
             '.' +
@@ -508,7 +522,7 @@ export class SwapInComponent implements OnInit {
           const balanceAsNumber = Number(stringBalance);
           denom.balance = Number(balanceAsNumber);
 
-          console.log(denom.balance);
+          /* console.log(denom.balance); */
           break;
         }
       }
@@ -553,7 +567,7 @@ export class SwapInComponent implements OnInit {
       )
       .subscribe(
         (res) => {
-          console.log(res);
+          /* console.log(res); */
           //this.formatPreviewAmounts(res);
           this.previewInformation = res;
           this.loading = false;
@@ -567,7 +581,7 @@ export class SwapInComponent implements OnInit {
               'Something went wrong... ' + '[' + err?.error?.message + ']',
             life: 50000,
           });
-          console.log(err);
+          /* console.log(err); */
           this.previewInformation = undefined;
           //this.routesChecked = true;
           /*  } */
@@ -637,11 +651,11 @@ export class SwapInComponent implements OnInit {
     this.skip_service
       .getMessagesForSwapOrTransfer(requestMessages)
       .subscribe(async (res) => {
-        console.log('messages: ', res);
+        /* console.log('messages: ', res); */
 
         const multihopMsg = res.msgs[0];
         const msgJSON = JSON.parse(multihopMsg.msg);
-        console.log('JSON message:', msgJSON);
+        /* console.log('JSON message:', msgJSON); */
         // get signing client
         let rpc_list = ChainRegistry.chains.find(
           (chain) => chain.chain_id === multihopMsg.chain_id
@@ -666,8 +680,8 @@ export class SwapInComponent implements OnInit {
         if (feeInfo?.average_gas_price) {
           averageGasPrice = feeInfo.average_gas_price;
         }
-        console.log('fee INFO' + feeInfo?.average_gas_price);
-        console.log('fee INFO' + feeInfo?.denom);
+        /* console.log('fee INFO' + feeInfo?.average_gas_price);
+        console.log('fee INFO' + feeInfo?.denom); */
 
         let signingStargateClient;
 
@@ -680,7 +694,7 @@ export class SwapInComponent implements OnInit {
             'Trying to find a free RPC provider that works to send the transaction...',
         });
         for (const rpc of rpc_list) {
-          console.log('rpc url', rpc);
+          /* console.log('rpc url', rpc); */
           //const registry = new Registry([...defaultRegistryTypes]);
           try {
             signingStargateClient =
@@ -695,7 +709,7 @@ export class SwapInComponent implements OnInit {
                 }
               );
           } catch (err) {
-            console.log(err);
+            /* console.log(err); */
             continue;
           }
           break;
@@ -707,7 +721,7 @@ export class SwapInComponent implements OnInit {
         this.messageService.clear('balances');
         //console.log('rpc url', RPC_URL);
 
-        console.log('entrou 3');
+        /* console.log('entrou 3'); */
         let msg;
         if (
           multihopMsg.msg_type_url ===
@@ -739,8 +753,8 @@ export class SwapInComponent implements OnInit {
         } else if (
           multihopMsg.msg_type_url === '/cosmwasm.wasm.v1.MsgExecuteContract'
         ) {
-          console.log(multihopMsg.msg_type_url);
-          console.log('multihopMsg: ', multihopMsg);
+          /* console.log(multihopMsg.msg_type_url);
+          console.log('multihopMsg: ', multihopMsg); */
           msg = {
             typeUrl: multihopMsg.msg_type_url,
             value: {
@@ -751,7 +765,7 @@ export class SwapInComponent implements OnInit {
             },
           };
         } else {
-          console.log(multihopMsg.msg_type_url);
+          /* console.log(multihopMsg.msg_type_url); */
 
           msg = {
             typeUrl: multihopMsg.msg_type_url,
@@ -763,7 +777,7 @@ export class SwapInComponent implements OnInit {
             },
           };
         }
-        console.log('msg: ', msg);
+        /* console.log('msg: ', msg); */
         this.messageService.add({
           key: 'broadcast',
           sticky: true,
@@ -777,7 +791,7 @@ export class SwapInComponent implements OnInit {
             [msg],
             undefined
           );
-          console.log('gasUsed', gasUsed);
+          /* console.log('gasUsed', gasUsed); */
           if (gasUsed) {
             deliverTxResponse = await signingStargateClient.signAndBroadcast(
               await this.wallet_service.getAddressForChain(
@@ -796,7 +810,7 @@ export class SwapInComponent implements OnInit {
             );
           }
         } catch (err: any) {
-          console.log(err);
+          /* console.log(err); */
           this.messageService.clear('broadcast');
           this.messageService.add({
             severity: 'error',
@@ -816,7 +830,7 @@ export class SwapInComponent implements OnInit {
           this.ongoingTracking = true;
           this.trackTxAndCheckStatus(deliverTxResponse);
         } else if (deliverTxResponse) {
-          console.log(deliverTxResponse);
+          /* console.log(deliverTxResponse); */
           this.messageService.add({
             severity: 'error',
             summary: 'Result',
@@ -825,9 +839,9 @@ export class SwapInComponent implements OnInit {
             life: 5000,
           });
         }
-        console.log('entrou 4');
+        /* console.log('entrou 4'); */
         //const tx = await signingStargateClient.sign(account[0], res.msgs, null, null);
-        console.log(deliverTxResponse);
+        /* console.log(deliverTxResponse); */
       });
   }
 
@@ -838,7 +852,7 @@ export class SwapInComponent implements OnInit {
       key: 'broadcast',
       sticky: true,
       severity: 'info',
-      summary: 'Traking the transation...',
+      summary: 'Tracking the transation...',
     });
     setTimeout(() => {
       if (!this.selectedOriginChain) return;
@@ -868,9 +882,8 @@ export class SwapInComponent implements OnInit {
               this.selectedOriginChain?.chain_id
             );
           }
-          this.logsService
-            .postLog('Inititate Tracking', address, err)
-            .subscribe((res) => console.log(res));
+          this.logsService.postLog('Inititate Tracking', address, err);
+          /* .subscribe((res) => console.log(res)) */
           //this.ongoingTracking = false;
         };
     }, 5000);
@@ -884,31 +897,31 @@ export class SwapInComponent implements OnInit {
   } */
 
   async executeCheckStatusLoop(txHash: string, chainId: string) {
-    console.log('entrou na função');
+    /* console.log('entrou na função'); */
     const ticket = interval(10000)
       .pipe(
-        tap(() => console.log('tick')),
+        /* tap(() => console.log('tick')), */
         take(30),
         switchMap(() => {
-          console.log('entrou switchMap');
+          /* console.log('entrou switchMap'); */
           return this.checkTxStatus(txHash, chainId);
         }),
         first((res) => {
           this.statusInformation = res;
-          console.log(res);
+          /* console.log(res); */
           if (
             res !== undefined &&
             (res.state === 'STATE_PENDING' ||
               res.state === 'STATE_SUBMITTED' ||
               res.state === 'STATE_RECEIVED')
           ) {
-            console.log('State: ', res.state);
+            /* console.log('State: ', res.state); */
             this.messageService.clear('broadcast');
             this.messageService.add({
               key: 'broadcast',
               sticky: true,
               severity: 'info',
-              summary: 'Traking the transation...[ ' + res?.state + ' ]',
+              summary: 'Tracking the transation...[ ' + res?.state + ' ]',
             });
           }
           return (
@@ -920,7 +933,7 @@ export class SwapInComponent implements OnInit {
       )
       .subscribe(
         async (res) => {
-          console.log('finalizour subscribe');
+          /* console.log('finalizour subscribe'); */
           this.messageService.clear('broadcast');
           if (res !== undefined && res.state === 'STATE_COMPLETED_SUCCESS') {
             this.messageService.add({
@@ -948,9 +961,8 @@ export class SwapInComponent implements OnInit {
                 this.selectedOriginChain?.chain_id
               );
             }
-            this.logsService
-              .postLog('Tracking Process', address, res)
-              .subscribe((res) => console.log(res));
+            this.logsService.postLog('Tracking Process', address, res);
+            /* .subscribe((res) => console.log(res)) */
           }
 
           /* if (
@@ -983,10 +995,9 @@ export class SwapInComponent implements OnInit {
             );
           }
           //this.ongoingTracking = false;
-          this.logsService
-            .postLog('Tracking Process', address, err)
-            .subscribe((res) => console.log(res));
-          console.log(err);
+          this.logsService.postLog('Tracking Process', address, err);
+          /* .subscribe((res) => console.log(res)) */
+          /* console.log(err); */
         }
       );
   }
@@ -1011,7 +1022,7 @@ export class SwapInComponent implements OnInit {
       const address = await this.wallet_service.getAddressForChain(chainID);
       userAddresses.push(address);
     }
-    console.log('user addresses', userAddresses);
+    /* console.log('user addresses', userAddresses); */
     req.address_list = userAddresses;
     req.slippage_tolerance_percent = this.slippage.toString();
     req.affiliates = [];
@@ -1019,10 +1030,17 @@ export class SwapInComponent implements OnInit {
   }
 
   formatPreviewAmounts(swapTransferRouteSummary: SwapTransferRouteSummary) {
-    const totalCharsIn = swapTransferRouteSummary.amount_in.length;
     const decimalsIn = this.selectedSourceDenom?.decimals
       ? this.selectedSourceDenom?.decimals
       : 0;
+    while (swapTransferRouteSummary.amount_in.length < decimalsIn) {
+      // @ts-ignore
+      swapTransferRouteSummary.amount_in =
+        '0' + swapTransferRouteSummary.amount_in;
+      /* console.log(swapTransferRouteSummary.amount_in); */
+    }
+    const totalCharsIn = swapTransferRouteSummary.amount_in.length;
+
     const stringBalanceIn =
       swapTransferRouteSummary.amount_in.substring(
         0,
@@ -1032,10 +1050,17 @@ export class SwapInComponent implements OnInit {
       swapTransferRouteSummary.amount_in.substring(totalCharsIn - decimalsIn);
     swapTransferRouteSummary.amount_in = stringBalanceIn;
 
-    const totalCharsOut = swapTransferRouteSummary.amount_out.length;
     const decimalsOut = this.selectedExitDenom?.decimals
       ? this.selectedExitDenom?.decimals
       : 0;
+    while (swapTransferRouteSummary.amount_out.length < decimalsOut) {
+      // @ts-ignore
+      swapTransferRouteSummary.amount_out =
+        '0' + swapTransferRouteSummary.amount_out;
+      /* console.log(swapTransferRouteSummary.amount_in); */
+    }
+    const totalCharsOut = swapTransferRouteSummary.amount_out.length;
+
     const stringBalanceOut =
       swapTransferRouteSummary.amount_out.substring(
         0,
@@ -1095,7 +1120,8 @@ export class SwapInComponent implements OnInit {
       this.selectedSourceDenom &&
       this.selectedExitDenom &&
       this.wallet_service.wallet_primary_connected &&
-      this.selectedSourceDenom.balance
+      (this.selectedSourceDenom.balance === 0 ||
+        !this.selectedSourceDenom.balance)
     ) {
       const address = await this.wallet_service.getAddressForChain(
         this.selectedOriginChain.chain_id
@@ -1136,7 +1162,7 @@ export class SwapInComponent implements OnInit {
           (chain) => chain.chain_id === operation.transfer?.chain_id
         );
         const idxOfOperation = operations.indexOf(operation);
-        console.log(this.previewInformation?.chain_ids);
+        /* console.log(this.previewInformation?.chain_ids); */
         const exitChain = this.chains.find(
           (chain) =>
             this.previewInformation?.chain_ids[
@@ -1149,9 +1175,9 @@ export class SwapInComponent implements OnInit {
               // @ts-ignore
               asset.denom === operation.transfer?.dest_denom
             ) {
-              console.log(asset);
+              /* console.log(asset); */
               // @ts-ignore
-              console.log(operation.transfer?.dest_denom);
+              /* console.log(operation.transfer?.dest_denom); */
               assetInfo = asset;
             }
           });
@@ -1172,16 +1198,16 @@ export class SwapInComponent implements OnInit {
         // @ts-ignore
         event.denomIcon = assetInfo?.logo_uri;
 
-        console.log(event);
+        /* console.log(event); */
       } else if (Object.keys(operation)[0] === 'swap') {
         event.operationType = 'Swap';
-        console.log(operation);
+        /* console.log(operation); */
         if (this.assets === undefined || !this.assets.chain_to_assets_map) {
           return;
         }
         const operationM = operation as SwapWrapper;
         const keys = Object.keys(this.assets?.chain_to_assets_map);
-        console.log(keys);
+        /* console.log(keys); */
         let swapDenomIn: Asset;
         let swapDenomOut: Asset;
         keys?.forEach((key) => {
@@ -1224,7 +1250,7 @@ export class SwapInComponent implements OnInit {
         event.swapDenomOutName = swapDenomOut?.name;
         // @ts-ignore
         event.swapDenomOutIcon = swapDenomOut?.logo_uri;
-        console.log(event);
+        /* console.log(event); */
         if (idxAdditionalForTransfersPreSwap === 1) {
           idxAdditionalForTransfersPreSwap = 0;
         }

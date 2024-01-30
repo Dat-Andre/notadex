@@ -28,50 +28,50 @@ export class WalletService {
 
   async connectToWallet(wallet: string, chain_id?: string) {
     this.wallet_primary_name = wallet;
-    console.log('wallet name', this.wallet_primary_name);
+    /* console.log('wallet name', this.wallet_primary_name); */
     switch (this.wallet_primary_name) {
       case this.LEAP:
         const { leap } = <any>window;
         this.wallet_primary = leap;
-        console.log('leap wallet', this.wallet_primary);
+        /* console.log('leap wallet', this.wallet_primary); */
         if (!chain_id) {
           await this.wallet_primary.enable(['juno-1']);
         } else {
           await this.wallet_primary.enable([chain_id]);
         }
         if (!this.wallet_primary) {
-          console.log('leap wallet not installed');
+          /* console.log('leap wallet not installed'); */
         } else {
           const key = await this.wallet_primary.getKey(
             chain_id ? chain_id : 'juno-1'
           );
           this.wallet_primary_connected = true;
-          console.log(
+          /* console.log(
             chain_id ? chain_id : 'juno-1' + ' address on leap',
             key.bech32Address
-          );
+          ); */
         }
         break;
       case this.KEPLR:
         const { keplr } = <any>window;
         this.wallet_primary = keplr;
-        console.log('keplr wallet', this.wallet_primary);
+        /* console.log('keplr wallet', this.wallet_primary); */
         if (!chain_id) {
           await this.wallet_primary.enable(['juno-1']);
         } else {
           await this.wallet_primary.enable([chain_id]);
         }
         if (!this.wallet_primary) {
-          console.log('keplar wallet not installed');
+          /* console.log('keplar wallet not installed'); */
         } else {
           const key = await this.wallet_primary.getKey(
             chain_id ? chain_id : 'juno-1'
           );
           this.wallet_primary_connected = true;
-          console.log(
+          /* console.log(
             chain_id ? chain_id : 'juno-1' + ' address on leap',
             key.bech32Address
-          );
+          ); */
           /*  this.wallet_primary.addEventListener(
             'keplr_keystorechange',
             () => {
@@ -97,11 +97,11 @@ export class WalletService {
     switch (this.wallet_primary_name) {
       case this.LEAP:
         await this.wallet_primary.disconnect();
-        console.log('leap disconnect');
+        /* console.log('leap disconnect'); */
         break;
       case this.KEPLR:
         await this.wallet_primary.disable();
-        console.log('keplr disconnect');
+        /* console.log('keplr disconnect'); */
         break;
     }
     this.wallet_primary = undefined;
@@ -112,12 +112,12 @@ export class WalletService {
     const offlineSigner = this.wallet_primary.getOfflineSigner('juno-1');
 
     const accounts = await offlineSigner.getAccounts();
-    console.log('accounts', accounts);
+    /* console.log('accounts', accounts); */
   }
 
   async getAddressForChain(chainID: string): Promise<string> {
     const key = await this.wallet_primary.getKey(chainID);
-    console.log(chainID + 'address', key.bech32Address);
+    /* console.log(chainID + 'address', key.bech32Address); */
     return key.bech32Address.toString();
   }
 }

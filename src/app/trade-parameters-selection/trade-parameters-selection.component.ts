@@ -56,7 +56,7 @@ export class TradeParametersSelectionComponent implements OnInit {
           );
         });
     }
-    console.log(!this.selectedExitChain, !this.selectedExitDenom);
+    /* console.log(!this.selectedExitChain, !this.selectedExitDenom); */
     if (
       value &&
       (value?.state === 'STATE_COMPLETED_SUCCESS' ||
@@ -140,7 +140,7 @@ export class TradeParametersSelectionComponent implements OnInit {
     if (adress === '' || denom === undefined) {
       return;
     }
-    console.log('getBalance');
+    /* console.log('getBalance'); */
     let rpcList = ChainRegistry.chains.find(
       (chain) => chain.chain_id === chainId
     )?.apis?.rpc;
@@ -159,7 +159,7 @@ export class TradeParametersSelectionComponent implements OnInit {
           const client = await StargateClient.connect(rpc.address);
           balance = await client.getBalance(adress, denom?.denom);
         } catch (err) {
-          console.log(err);
+          /* console.log(err); */
           continue;
         }
         if (balance) {
@@ -172,7 +172,7 @@ export class TradeParametersSelectionComponent implements OnInit {
           const balanceAsNumber = Number(stringBalance);
           denom.balance = Number(balanceAsNumber);
 
-          console.log(denom.balance);
+          /* console.log(denom.balance); */
           break;
         }
       }

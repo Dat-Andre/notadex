@@ -125,7 +125,9 @@
           alt=""
           onerror="this.style.display='none'"
         />
-        ${{ denom.recommended_symbol | uppercase }}
+        <span class="ellipsis-add"
+          >${{ denom.recommended_symbol | uppercase }}</span
+        >
       </div>
       <div class="origin">
         Balance:
@@ -272,7 +274,7 @@
     >
       <p class="m-0" *ngIf="!addDestinyWallet">
         <span style="color: #616161" *ngIf="destinyWalletAddress !== ''"
-          >Destiny wallet:&nbsp;<i>{{ destinyWalletAddress }}</i></span
+          >Destination wallet:&nbsp;<i>{{ destinyWalletAddress }}</i></span
         >
       </p>
       <p class="m-0" *ngIf="!addDestinyWallet">
