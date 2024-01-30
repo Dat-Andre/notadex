@@ -211,7 +211,7 @@ export class TransactionInfoComponent implements OnInit {
         // @ts-ignore
         event.denomIcon = assetInfo?.logo_uri;
 
-        console.log(event);
+        //console.log(event);
       } else if (Object.keys(operation)[0] === 'swap') {
         event.operationType = 'Swap';
         /* console.log(operation); */
