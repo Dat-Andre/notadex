@@ -233,6 +233,7 @@ export class SwapInComponent implements OnInit {
       this.selectedExitChain = res.chains[0];
       this.chains = res.chains;
       this.filteredChains = [...this.chains];
+      this.checkIfThereAreBalances();
 
       this.wallet_service.walletConnected.subscribe(async (val: boolean) => {
         this.reloadAfterWalletConnectionOrAccountChange(val);
@@ -266,6 +267,7 @@ export class SwapInComponent implements OnInit {
 
   async reloadAfterWalletConnectionOrAccountChange(val: boolean) {
     if (val) {
+      this.checkIfThereAreBalances();
       this.wallet_service.enableChain('juno-1');
       if (this.selectedOriginChain && !this.selectedSourceDenom) {
         this.wallet_service.enableChain(this.selectedOriginChain.chain_id);
@@ -316,9 +318,40 @@ export class SwapInComponent implements OnInit {
     }
   }
 
-  /* searchTextApplyFilter() {
-    console.log(this.searchText);
-  } */
+  checkIfThereAreBalances() {
+    if (
+      this.chains &&
+      this.chains.length > 0 &&
+      this.wallet_service.wallet_primary_connected
+    ) {
+      this.chains.forEach(async (chain) => {
+        let rpcList = ChainRegistry.chains.find(
+          (rpc_chain) => chain.chain_id === rpc_chain?.chain_id
+        )?.apis?.rpc;
+
+        if (rpcList) {
+          rpcList = this.shuffleArray(rpcList);
+          for (const rpc of rpcList) {
+            let balances;
+
+            try {
+              const client = await StargateClient.connect(rpc.address);
+              balances = await client.getAllBalances(
+                await this.wallet_service.getAddressForChain(chain.chain_id)
+              );
+            } catch (err) {
+              continue;
+            }
+            if (balances && balances.length > 0) {
+              // console.log(balances);
+              chain.hasBalances = true;
+            }
+            break;
+          }
+        }
+      });
+    }
+  }
 
   getChainPrefixFromRegistry(chainId: string | undefined) {
     if (!chainId) {
@@ -434,6 +467,7 @@ export class SwapInComponent implements OnInit {
           continue;
         }
         if (balances) {
+          //console.log('balances for chainId: ' + chainId, balances);
           balances?.forEach((balance) => {
             const denom = this.availableDenoms.find(
               (denom) => denom.denom === balance.denom

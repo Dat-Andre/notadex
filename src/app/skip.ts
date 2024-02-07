@@ -10,6 +10,7 @@ export interface Chain {
   logo_uri: string;
   fee_assets: AssetDenomGas[];
   chain_type: string;
+  hasBalances?: boolean;
 }
 
 export interface AssetDenomGas {

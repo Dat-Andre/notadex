@@ -38,8 +38,14 @@
       (click)="selectSourceChain(chain)"
       *ngFor="let chain of filteredChains"
     >
-      <div class="items">
+      <div
+        class="items"
+        [ngStyle]="{
+          'background-color': chain.hasBalances ? '#312300' : ''
+        }"
+      >
         <span>{{ chain.chain_name | uppercase }}</span>
+        <!-- <span>has money: {{ chain.hasBalances }}</span> -->
         <img
           style="width: 25px; height: 25px; margin-left: 5px"
           [src]="
