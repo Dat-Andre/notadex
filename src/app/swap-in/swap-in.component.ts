@@ -403,7 +403,6 @@ export class SwapInComponent implements OnInit {
     }
     /* console.log(chainId);
     console.log(this.selectedOriginChain); */
-    console.log(ChainRegistry.chains);
     let rpcList = ChainRegistry.chains.find(
       (chain) =>
         chain.chain_id ===
