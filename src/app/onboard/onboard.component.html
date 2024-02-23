@@ -1,7 +1,7 @@
 <div class="container-base grid">
   <!-- <div class="col-1"></div> -->
   <div class="col-12">
-    <div class="question">Whatcha wanna do?</div>
+    <!-- <div class="question">Whatcha wanna do?</div> -->
     <div class="options-container">
       <div class="base-space" (click)="routeToSwapIn()">
         <p-card header="get IN" class="wallet-cards">
@@ -29,6 +29,12 @@
       (click)="navigateToLink()"
       style="cursor: pointer; color: coral"
     ></i>
+  </div>
+  <div
+    class="col-12"
+    style="display: flex; align-items: center; justify-content: center"
+  >
+    <img src="../assets/img/Wordmark.png" style="width: 75%; opacity: 0.25" />
   </div>
   <div class="col-12" style="text-align: center; margin-top: 5rem">
     <i class="pi pi-gift" (click)="friends = !friends"></i>

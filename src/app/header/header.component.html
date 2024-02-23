@@ -42,9 +42,12 @@
     ></div>
   </div>
   <div
-    class="card flex"
+    class="card flex logo"
     style="align-items: center; flex-wrap: wrap; margin: 5px"
   >
+    <img alt="x_logo" src="../assets/img/notadex_png_logo.png" />
+  </div>
+  <div class="card flex connect">
     <!--     <div class="col-12 lg:col-7"> -->
     <p class="m-0" *ngIf="walletService.wallet_primary && walletAddress !== ''">
       <span (click)="addToClipboard(walletAddress)" class="connected-address"

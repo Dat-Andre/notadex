@@ -8,7 +8,12 @@
   flex-direction: column;
   min-height: 100vh;
   overflow: hidden;
-  background: #121212;
+  // background: #121212;
+}
+
+.app-container::before {
+  background-image: url("../assets/img/Wordmark.png");
+  // opacity: 0.75;
 }
 
 .base-element {
