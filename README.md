@@ -1,4 +1,8 @@
-# MyDex
+# NotaDex
+
+<a href="https://notadex.zone/">Live here</a>
+
+Powered by <a href="https://www.skip.build/">SKIP</a>
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.3.
 
